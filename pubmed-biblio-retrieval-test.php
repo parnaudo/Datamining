@@ -1,7 +1,7 @@
 <?php
 
 /*
-This script accepts as an input a list of authors names and queries the pubmed database for all the papers attributed to the author. It then parses all the authors listed on the paper, marks the first, second and last author and records them to a sepaarate table. 
+This script accepts as an input a list of authors names and queries the pubmed database for all the papers attributed to the author. It then parses all the authors listed on the paper, marks the first, second and last author and records them to a sepaarate table. Woot 
 
 Written by Paul Arnaudo 2/17/12 
 */
