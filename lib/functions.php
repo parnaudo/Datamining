@@ -48,6 +48,7 @@ function createAttributesTable($insertTable){
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `atomId` int(11) DEFAULT NULL,
   `firstName` varchar(20) DEFAULT NULL,
+  `middleName` varchar(20) DEFAULT NULL,
   `lastName` varchar(20) DEFAULT NULL,
   `zipcode` varchar(20) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
@@ -60,6 +61,7 @@ function createAttributesTable($insertTable){
   `fellowship` varchar(50) DEFAULT NULL,
   `menumber` varchar(11) DEFAULT NULL,
   `fellowshipyear` int(11) DEFAULT NULL,
+  `specialty` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4279 DEFAULT CHARSET=latin1;
 ";
