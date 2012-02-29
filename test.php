@@ -1,10 +1,10 @@
 <?php
-$correct = "0051975080";
-$incorrect = "051975080";
-$test = str_pad($incorrect, 10, "0", STR_PAD_LEFT);
+$time = "17 February 2007";
+$CorrectTime = date('Y-m-d',strtotime($time));
+
 //echo $test;
-echo $correct."<br>";
-echo $incorrect."<br>";
-echo $test;
+echo $time."<br>";
+echo "time: ". $CorrectTime."<br>";
+echo strtotime("17 February 2007");
 
 ?>

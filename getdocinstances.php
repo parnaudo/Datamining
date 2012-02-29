@@ -102,6 +102,11 @@ while($row = mysql_fetch_array($result)){
 		$updateQuery = "update ".$insertTable." SET tenureto ='".$date."' where atomId='".$particlerow['atomId']."' AND isotopeId = '".$particlerow['isotopeId']."'";
 		$countUpdates++;	
 		}
+		elseif($row['matterId']==='157'){
+		$date = cleanDate($particlerow['value']);
+		$updateQuery = "update ".$insertTable." SET tenureto ='".$date."' where atomId='".$particlerow['atomId']."' AND isotopeId = '".$particlerow['isotopeId']."'";
+		$countUpdates++;	
+		}
 		mysql_query($updateQuery);
 	}
 }

@@ -1,6 +1,8 @@
 
 <?php
-
+/*
+This script attempts to reconcile me numbers and their schools. Without having any type of key for ME numbers, might be of value to start mining numbers and matching them to medical schools. 
+*/
 include("lib/init.php");	 
 $count=0;
 
@@ -24,7 +26,7 @@ function linkMEnumber($searchstring){
 				}
 				else{
 					$MEinfo = array("menumber" => strval($schoolID), "university"=>$rowMedschool['value']);
-					$insertQuery="INSERT INTO universitymenumbers (menumber, universityname) VALUES ('".$schoolID."', '".$MEinfo['university']."')";
+					$insertQuery="INSERT INTO universitymenumbers (menumber, universityname,atomId) VALUES ('".$schoolID."', '".$MEinfo['university']."', '".$row['atomId']."')";
 					mysql_query($insertQuery);
 					echo $insertQuery;
 					echo "<br>";
@@ -38,7 +40,7 @@ function linkMEnumber($searchstring){
 	}
 	echo $numRows. " results with ".$count." medical education number hits";
 }
-createMETable("universitymenumbers");
+//createMETable("universitymenumbers");
 linkMEnumber(me_number);
 linkMEnumber(menumber);
 linkMEnumber("me number");

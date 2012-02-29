@@ -17,6 +17,14 @@ $result=mysql_query($particlecount) or die(mysql_error());
 	
 return $matterArray;
 }
+function clearAuthorTables(){
+	$authors="DELETE FROM authors";
+	$papers="DELETE FROM papers";
+	mysql_query($authors);
+	mysql_query($papers);
+	
+	
+}
 function createInstanceTable($insertTable){
 	
 	$createTable="CREATE TABLE `".$insertTable."` (

@@ -38,15 +38,20 @@ while($row = mysql_fetch_array($result)){
 		
 		$countUpdates++;
 	}
-/*	elseif(preg_match("/zip/i",$row['name'])){
+	elseif(preg_match("/middle/i",$row['name'])){	
+		$updateQuery = "update ".$insertTable." SET middleName ='".addslashes($row['value'])."' where atomId='".$row['atomId']."'";
+		
+		$countUpdates++;
+	}
+	elseif(preg_match("/zip/i",$row['name'])){
 		if(preg_match("	/zipsector/i", $row['name'])){
-			break;
+			$updateQuery='';
 		}
 		else{	
 		$updateQuery = "update ".$insertTable." SET zipcode ='".$row['value']."' where atomId='".$row['atomId']."'";
 		$countUpdates++;
 		}
-	}*/
+	}
 	elseif(preg_match("/phone/i",$row['name'])){	
 		$updateQuery = "update ".$insertTable." SET phone ='".$row['value']."' where atomId='".$row['atomId']."'";
 		$countUpdates++;	
@@ -55,7 +60,7 @@ while($row = mysql_fetch_array($result)){
 	elseif(preg_match("/medical degree from/i",$row['name']) || preg_match("/medschool/i",$row['name']) || preg_match("/medical school name/i",$row['name']))
 	{
 		
-		$updateQuery = "update ".$insertTable." SET medschool ='".addslashes($row['value'])."' where atomId='".$row['atomId']."'<br>";
+		$updateQuery = "update ".$insertTable." SET medschool ='".addslashes($row['value'])."' where atomId='".$row['atomId']."'";
 		$countUpdates++;
 		
 		
@@ -108,6 +113,19 @@ while($row = mysql_fetch_array($result)){
 		$countUpdates++;
 		
 	}
+	//Specialty input
+	elseif($row['matterId']==='157'){
+		$updateQuery = "update ".$insertTable." SET specialty ='".$row['value']."' where atomId='".$row['atomId']."'";
+		$countUpdates++;	
+		
+		}
+		
+		//hospital input
+		elseif($row['matterId']==='672'){
+		$updateQuery = "update ".$insertTable." SET hospital ='".$row['value']."' where atomId='".$row['atomId']."'";
+		$countUpdates++;	
+		
+		}
 	else{
 		
 	}

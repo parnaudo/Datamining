@@ -3,7 +3,7 @@ include("lib/init.php");
 $Start = getTime(); 
 $row = 1;
 //Open input CSV
-if (($handle = fopen("HCPpubtolookup.csv", "r")) !== FALSE) {
+if (($handle = fopen("endopubtolookup.csv", "r")) !== FALSE) {
     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
         $queryString='';
 
@@ -24,7 +24,7 @@ if (($handle = fopen("HCPpubtolookup.csv", "r")) !== FALSE) {
 		$queryNPI=$data[0];
 		echo $queryNPI."<br>";
 
-		$query = $queryString.'[Author] AND (oncology OR cancer) AND ("2001"[Date - Publication] : "3000"[Date - Publication])'; // for example
+		$query = $queryString.'[Author] AND (endocrinology OR diabetes) '; // for example AND (endocrinology OR diabetes) AND ("2001"[Date - Publication] : "3000"[Date - Publication])
 		echo "trying: ". $query;
 		//Lets see if there are any hits
 		pubmed_fetch($query, $queryNPI);
@@ -76,7 +76,7 @@ function pubmed_fetch($query, $queryNPI){
   system(sprintf("wget --output-document=%s %s", escapeshellarg($file), escapeshellarg($url)));
 
 //Write NPI, query term and count to output CSV
-  $fp = fopen('test.csv', 'a+');
+  $fp = fopen('endoCitationCounts.csv', 'a+');
 	$list=array(
 		array($queryNPI,$query,$count)
 		);

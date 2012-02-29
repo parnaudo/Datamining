@@ -1,6 +1,6 @@
 <?php
 
-$CFG->dbname = "zephyr3";
+$CFG->dbname = "zephyr";
 	$CFG->dbuser = "root";
 	$CFG->dbpass = 'rubberbabybuggybumpers';
 	$CFG->dbtype = 'mysql';

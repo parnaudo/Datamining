@@ -26,10 +26,11 @@ else{
 	//Drop and create if it has
 }
 	
-$getAtomIds="select distinct atomId,value from particles
+$getAtomIds="select distinct atomId from particles
 INNER JOIN zipcodes ON zipcodes.zipCodeValue=particles.value
-where latitude > 37 AND latitude < 38 AND longitude < -121.6
-";
+where latitude > 37 AND latitude < 38 AND longitude < -121.6 ";
+//
+
 echo $getAtomIds;
 //Get all particles relevant to our subjects
 $result = mysql_query($getAtomIds) or die(mysql_error());
@@ -38,8 +39,9 @@ $stringreplace=array(" ","-","&","(",")","|","/",",",".",";","=","#",":","'","+"
 $countColumns=0;	
 $countRows=0;
 while($row = mysql_fetch_array($result)){
-	$insertQuery = "INSERT INTO ".$insertTable." (atomId,zipcode) VALUES ('".$row['atomId']."','".$row['value']."')";
+	$insertQuery = "INSERT INTO ".$insertTable." (atomId) VALUES ('".$row['atomId']."')";
 	mysql_query($insertQuery);
+	
 }
 	$End = getTime(); 
 	echo "Time taken = ".number_format(($End - $Start),2)." secs<br>";
