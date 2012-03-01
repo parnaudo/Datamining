@@ -67,17 +67,17 @@ while($row=mysql_fetch_array($result)){
 				if(strpos($attributeName,"PubDate")===0){
 				$pubdate= $item[0];	
 			}
-			mysql_query($insertJournalQuery);
+		
 			if(strpos($attributeName,"AuthorList")===0){
 				$lastAuthor=$item->count();
 				
 				$countAuthors = 1;
 				//parse authors and insert them into DB
 			 	foreach($item->children() as $author){
-					$targetPhysician='';
+					$targetPhysician=$row['atomId'];;
 					$physicianQuery='';
 					if(stripos($author,$row['lastName'])===0){
-						$targetPhysician=$row['atomId'];
+						
 						$physicianQuery=$query;
 					}
 				

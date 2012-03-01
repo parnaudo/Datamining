@@ -65,7 +65,7 @@ while($row=mysql_fetch_array($result)){
 				if(strpos($attributeName,"PubDate")===0){
 				$pubdate= $item[0];	
 			}
-			mysql_query($insertJournalQuery);
+		
 			if(strpos($attributeName,"AuthorList")===0){
 				$lastAuthor=$item->count();
 				

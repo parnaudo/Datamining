@@ -1,7 +1,7 @@
 <?php
 
 /*
-This script accepts as an input a list of authors names and queries the pubmed database for all the papers attributed to the author. It then parses all the authors listed on the paper, marks the first, second and last author and records them to a sepaarate table. Woot 
+This script accepts as an input a list of authors names and queries the pubmed database for all the papers attributed to the author. It then parses all the authors listed on the paper, marks the first, second and last author and records them to a sepaarate table. 
 
 Written by Paul Arnaudo 2/17/12 
 */
@@ -67,33 +67,22 @@ while($row=mysql_fetch_array($result)){
 				if(strpos($attributeName,"PubDate")===0){
 				$pubdate= $item[0];	
 			}
-			mysql_query($insertJournalQuery);
+			
 			if(strpos($attributeName,"AuthorList")===0){
 				$lastAuthor=$item->count();
 				
 				$countAuthors = 1;
 				//parse authors and insert them into DB
 			 	foreach($item->children() as $author){
-					$targetPhysician='';
+					$targetPhysician=$row['atomId'];;
 					$physicianQuery='';
 					if(stripos($author,$row['lastName'])===0){
-						$targetPhysician=$row['atomId'];
-						$physicianQuery=$query;
-					}
-				
-					if($countAuthors===1 || $countAuthors===2){	
 						
-						$insertAuthorQuery = "INSERT INTO authors (author, paper, importantAuthor, atomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";
-					}
-					elseif($countAuthors===$lastAuthor){
-						$insertAuthorQuery = "INSERT INTO authors (author, paper, importantAuthor,atomId,query) VALUES ('".$author."','".$uid."','3','".$targetPhysician."','".$physicianQuery."')";
-					}
-					else{
-						$insertAuthorQuery = "INSERT INTO authors (author, paper,atomId,query) VALUES ('".$author."','".$uid."','".$targetPhysician."','".$physicianQuery."')";	
-					}
-					
-					mysql_query($insertAuthorQuery);
-					$countAuthors++; 
+						$physicianQuery=$query;
+					}	
+						$insertAuthorQuery = "INSERT INTO authors (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";				
+						mysql_query($insertAuthorQuery);
+						$countAuthors++; 
 				}
 				
 			}

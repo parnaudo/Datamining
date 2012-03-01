@@ -76,7 +76,7 @@ if (($handle = fopen("exampledataTest.csv", "r")) !== FALSE) {
 				if(strpos($attributeName,"PubDate")===0){
 				$pubdate= $item[0];	
 			}
-			mysql_query($insertJournalQuery);
+		
 			if(strpos($attributeName,"AuthorList")===0){
 				$lastAuthor=$item->count();
 				
