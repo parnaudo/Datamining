@@ -25,10 +25,9 @@ else{
 	createAttributesTable($insertTable);
 	//Drop and create if it has
 }
-	
-$getAtomIds="select distinct atomId from particles
-INNER JOIN zipcodes ON zipcodes.zipCodeValue=particles.value
-where latitude > 37 AND latitude < 38 AND longitude < -121.6 ";
+//matter 161 is zipcode fixed for zdb	
+$getAtomIds="select distinct atomId from particles INNER JOIN zipcodes ON zipcodes.zipCodeValue=particles.value
+where matterId=161 AND latitude > 37 AND latitude < 38 AND longitude < -121.6 ";
 //
 
 echo $getAtomIds;

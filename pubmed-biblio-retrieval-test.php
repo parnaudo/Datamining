@@ -12,16 +12,16 @@ $Start = getTime();
 clearAuthorTables();
 
 //query to get doctor set, can really be from anywhere
-$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where atomId=28882";
+$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!=''";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
- 	
+ 	$query='';
   $query = $row['firstName']." ".$row['middleName']." ".$row['lastName']; //your query term
   print "<br>Searching for: $query\n";
   $params = array(
     'db' => 'pubmed',
     'retmode' => 'xml',
-    'retmax' => 100,
+    'retmax' => 200,
     'usehistory' => 'y',
 	'tool' => 'SCUcitationminer',
 	'email' => 'parnaudo@scu.edu',
@@ -80,8 +80,12 @@ while($row=mysql_fetch_array($result)){
 						
 						$physicianQuery=$query;
 					}	
+					if($countAuthors===$lastAuthor){
+						$countAuthors='500';
+					}
 						$insertAuthorQuery = "INSERT INTO authors (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";				
 						mysql_query($insertAuthorQuery);
+						echo $insertAuthorQuery;
 						$countAuthors++; 
 				}
 				
@@ -91,7 +95,7 @@ while($row=mysql_fetch_array($result)){
 	
 		}
 		$insertJournalQuery = "INSERT INTO papers (id, title, journal, numAuthors, pubDate) VALUES ('".$uid."','".$title."','".$journal."','".$lastAuthor."','".$pubdate."')";
-	
+		echo $insertJournalQuery;
   		mysql_query($insertJournalQuery);
 	
 	}

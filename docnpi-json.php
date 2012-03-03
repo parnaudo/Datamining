@@ -7,7 +7,7 @@ Written by Paul Arnaudo 2/24/12
 include("lib/init.php");	
 $Start = getTime(); 
 //target set
-$queryDoctors = "SELECT atomId, firstName,zipcode, lastName from tempdoc";
+$queryDoctors = "SELECT atomId, firstName,zipcode, lastName FROM tempdoc WHERE specialty IS NULL";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
 /*
