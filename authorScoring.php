@@ -12,12 +12,17 @@ $Start = getTime();
 //clearAuthorTables();
 
 //query to get doctor set, can really be from anywhere
-$queryDoctors = "SELECT distinct paper, coAuthorPosition, query from authors where query!=''";
-$result = mysql_query($queryDoctors) or die(mysql_error());
-while($row=mysql_fetch_array($result)){
-	$updateQuery='UPDATE authors SET authorPosition='.$row['coAuthorPosition'].' WHERE paper='.$row['paper'];
-	mysql_query($updateQuery);
-}
+$scoringArray=array( array(NULL,1,2,500,'x'),
+					 array(1,NULL,.8,.6,.2),
+					 array(2,.8,NULL,.4,.1),
+					 array(500,.6,.4,NULL,.1),
+					 array('x',.2,.1,.1,NULL)
+					);
+					var_dump($scoringArray);
+					echo $scoringArray[1][0];
+					echo $scoringArray[2][0];
+					echo $scoringArray[0][2];
+					
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs";
 ?>
