@@ -16,40 +16,30 @@ $scoringArray=array( array(NULL,1,2,500,'x'),
 					 array(1,NULL,.8,.6,.2),
 					 array(2,.8,NULL,.4,.1),
 					 array(500,.6,.4,NULL,.1),
-					 array('x',.2,.1,.1,NULL)
+					 array('x',.2,.1,.1,.05)
 					);
+
 					var_dump($scoringArray);
-					print "-".$scoringArray[1][1].$scoringArray[0][2].$scoringArray[0][3].$scoringArray[0][4]." <br>";
-					print $scoringArray[1][0]." <br>" ;
-					print $scoringArray[2][0]." <br>";
-					print $scoringArray[3][0]." <br>";
-					print $scoringArray[4][0]." <br>";	
-$query="SELECT coAuthorPosition, authorPosition FROM authors WHERE id=1889231";
+/*
+$getRelationships="SELECT distinct  coAuthor, authorAtomId from authors where query='' and authorAtomId=29682 order by authorAtomId,coAuthor;";
+$result=mysql_query($getRelationships);
+while($row=mysql_fetch_array($result)){
+	$insertQuery="INSERT INTO relationship (coAuthor,authorAtom) VALUES ('".$row['coAuthor']."','".$row['authorAtomId']."')";	
+	mysql_query($insertQuery);
+	
+}*/
+$query="SELECT   relationship.id,`authors`.coAuthor, authorAtomId, paper, coAuthorPosition,authorPosition from authors INNER JOIN relationship ON relationship.coAuthor=`authors`.coAuthor AND authorAtom=authorAtomId
+where query='' and authorAtomId=29682 order by authorAtomId,coAuthor;
+";
 $result=mysql_query($query);
+
 while($rowauthor=mysql_fetch_array($result)){
-echo "coauthor: ".$rowauthor['coAuthorPosition'] ." Author position:".$rowauthor['authorPosition']."<br>";				
-}
-for ($row = 0; $row < 5; $row++)
-{
-    echo "<li><b>The row number $row</b>";
-    echo "<ul>";
+	echo $rowauthor['coAuthorPosition']; echo $rowauthor['authorPosition'];
+	$coordinates = scoringTransform($rowauthor['coAuthorPosition'],$rowauthor['authorPosition']);
+	$score=$scoringArray[$coordinates[0]][$coordinates[1]];
+	$updateQuery="UPDATE relationship SET relationship = (relationship + ".$score.") WHERE id='".$rowauthor['id']."' ";
+	mysql_query($updateQuery);
 
-	
-	
-    for ($col = 0; $col < 5; $col++)
-    {
-		
-        echo $col.": ".$scoringArray[$row][$col]."<br>";
-		while($row===0){
-			if(	$scoringArray[$row][$col]===$rowauthor['coAuthorPosition']){
-			echo "BINGO";	
-			}
-			
-		}
-	}
-
-    echo "</ul>";
-    echo "</li>";
 }
 					
 $End = getTime(); 
