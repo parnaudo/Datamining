@@ -6,6 +6,7 @@ Written by Paul Arnaudo 2/24/12
 */
 include("lib/init.php");	
 $Start = getTime(); 
+$count=0;
 //target set
 $queryDoctors = "SELECT atomId, firstName,zipcode, lastName FROM tempdoc WHERE specialty IS NULL";
 $result = mysql_query($queryDoctors) or die(mysql_error());
@@ -46,10 +47,10 @@ while($row=mysql_fetch_array($result)){
 	if(!empty($specialty)){
 		$specialtyQuery = "UPDATE tempdoc SET specialty='".$specialty."' WHERE atomId='".$row['atomId']."'";
 		mysql_query($specialtyQuery);
-		echo $specialtyQuery."<br>";
+		$count++;
 	}
 }
 $End = getTime(); 
-echo "Time taken = ".number_format(($End - $Start),2)." secs";
+echo "Time taken = ".number_format(($End - $Start),2)." secs with ".$count." updates";
 
 ?>

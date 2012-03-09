@@ -12,7 +12,7 @@ $Start = getTime();
 //clearAuthorTables();
 
 //query to get doctor set, can really be from anywhere
-$queryDoctors = "SELECT distinct paper, coAuthorPosition, query from authors where id < 889231";
+$queryDoctors = "SELECT distinct paper, coAuthorPosition, query from authors where query!=''";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
 	$updateQuery='UPDATE authors SET authorPosition='.$row['coAuthorPosition'].' WHERE paper='.$row['paper'];

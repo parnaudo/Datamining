@@ -135,4 +135,42 @@ function cleanTable($table){
 	
 	mysql_query($deleteQuery);
 }
+function scoringTransform($row, $col){
+	switch ($row) {
+    case 1:
+   //     echo "coauthor 1";
+		$row=1;
+        break;
+    case 2:
+  //      echo "coauthor 2";
+		$row=2;
+        break;
+    case 500:
+		$row=3;
+   //     echo "coauthor 500";
+        break;
+    default:
+		$row=4;
+    //   echo "coauthor X";
+}
+	switch ($col) {
+    case 1:
+		$col=1;
+    //    echo "author 1";
+        break;
+    case 2:
+		$col=2;
+     //   echo "author 2";
+        break;
+    case 500:
+		$col=3;	
+      //  echo "author 500";
+        break;
+    default:
+		$col=4;
+     //  echo "author X";
+}	
+	return $coordinates=array($row,$col);
+}
+	
 ?>

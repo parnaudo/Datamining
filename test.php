@@ -1,10 +1,10 @@
-<?php
-$time = "17 February 2007";
-$CorrectTime = date('Y-m-d',strtotime($time));
-
-//echo $test;
-echo $time."<br>";
-echo "time: ". $CorrectTime."<br>";
-echo strtotime("17 February 2007");
-
+<?php 
+$middleInitial="Laird JR";
+$noMiddleInitial="Laird J";
+$test=strpos($middleInitial," ");
+$testString=substr($middleInitial,0,strlen($middleInitial)-1);
+echo $testString;
+echo $test;
+echo strlen($middleInitial);
+echo strlen($noMiddleInitial);
 ?>
