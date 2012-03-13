@@ -24,7 +24,11 @@ $scoringArray=array( array(NULL,1,2,500,'x'),
 					
 
 clearTable($table);
-$getRelationships="SELECT distinct  coAuthor, authorAtomId from authors where query='' and authorAtomId=82387 order by authorAtomId,coAuthor DESC";
+$getRelationships="SELECT distinct  coAuthor, authorAtomId from authors where query='' and authorAtomId IN (28786,
+68527,
+82104,
+82137,
+31218) order by authorAtomId,coAuthor DESC";
 $result=mysql_query($getRelationships);
 //Get distinct author and coauthor records
 while($row=mysql_fetch_array($result)){
