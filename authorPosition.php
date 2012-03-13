@@ -13,6 +13,6 @@ updateAuthorPosition();
 //clearAuthorTables();
 
 $End = getTime(); 
-echo "Time taken = ".number_format(($End - $Start),2)." secs";
+echo "Time taken = ".number_format(($End - $Start),2)." seconds";
 
 ?>

@@ -65,5 +65,5 @@ while($row=mysql_fetch_array($result)){
 	$lastEntry=$row['coAuthor'];
 }				
 $End = getTime(); 
-echo "Time taken = ".number_format(($End - $Start),2)." secs";
+echo "Time taken = ".number_format(($End - $Start),2)." seconds";
 ?>
