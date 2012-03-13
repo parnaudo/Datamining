@@ -24,7 +24,7 @@ $scoringArray=array( array(NULL,1,2,500,'x'),
 					
 
 clearTable($table);
-$getRelationships="SELECT distinct  coAuthor, authorAtomId from authors where query='' and authorAtomId=82387 order by authorAtomId,coAuthor DESC";
+$getRelationships="SELECT distinct  coAuthor, authorAtomId from coAuthorInstance where query='' and authorAtomId=82387 order by authorAtomId,coAuthor DESC";
 $result=mysql_query($getRelationships);
 //Get distinct author and coauthor records
 while($row=mysql_fetch_array($result)){
@@ -41,8 +41,8 @@ while($row=mysql_fetch_array($result)){
 	//insert into relationship table
 	mysql_query($insertQuery);
 	
-	$coAuthorQuery="SELECT numAuthors, coAuthorPosition, authorPosition from authors INNER JOIN papers on papers.id=paper  where query='' AND coAuthor='".$row['coAuthor']."' AND authorAtomId=".$row['authorAtomId'];
-	
+	$coAuthorQuery="SELECT numAuthors, coAuthorPosition, authorPosition from coAuthorInstance INNER JOIN papers on papers.id=paper  where query='' AND coAuthor='".$row['coAuthor']."' AND authorAtomId=".$row['authorAtomId'];
+	echo $coAuthorQuery;
 	$coAuthorResult=mysql_query($coAuthorQuery);
 
 	//get all coauthor instances with author and coauthor
@@ -50,13 +50,14 @@ while($row=mysql_fetch_array($result)){
 		$numAuthorModifier= round(1/($rowauthor['numAuthors']-1),2);
 		$coordinates = scoringTransform($rowauthor['coAuthorPosition'],$rowauthor['authorPosition']);
 		$score=$scoringArray[$coordinates[0]][$coordinates[1]];
-		$score=($score*$numAuthorModifier);
+		$score=($score*$numAuthorModifier)*10;
 		if($matchFlag===1){
 			$updateQuery="UPDATE relationship SET relationship = (relationship + ".$score."),paperCount=(paperCount+1) WHERE coAuthor='".$lastEntry."' AND authorAtom=".$row['authorAtomId'];
 		}
 		else{
 			$updateQuery="UPDATE relationship SET relationship = (relationship + ".$score."),paperCount=(paperCount+1) WHERE coAuthor='".$row['coAuthor']."' AND authorAtom=".$row['authorAtomId'];
 		}
+		echo $updateQuery."<BR>";
 		mysql_query($updateQuery);
 	
 		

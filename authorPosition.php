@@ -8,16 +8,11 @@ Written by Paul Arnaudo 2/17/12
 include("lib/init.php");	
 
 $Start = getTime(); 
+updateAuthorPosition();
 //remove old data
 //clearAuthorTables();
 
-//query to get doctor set, can really be from anywhere
-$queryDoctors = "SELECT distinct paper, coAuthorPosition, query from authors where query!=''";
-$result = mysql_query($queryDoctors) or die(mysql_error());
-while($row=mysql_fetch_array($result)){
-	$updateQuery='UPDATE authors SET authorPosition='.$row['coAuthorPosition'].' WHERE paper='.$row['paper'];
-	mysql_query($updateQuery);
-}
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs";
+
 ?>
