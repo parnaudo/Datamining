@@ -1,10 +1,15 @@
 <?php 
-$middleInitial="Laird JR";
+include("lib/init.php");	
+$author="arnaudo pa";
 $noMiddleInitial="Laird J";
 $test=strpos($middleInitial," ");
-$testString=substr($middleInitial,0,strlen($middleInitial)-1);
-echo $testString;
-echo $test;
-echo strlen($middleInitial);
-echo strlen($noMiddleInitial);
+$testQuery= "SELECT id FROM authors WHERE name LIKE '".$author."'";
+$result=mysql_query($testQuery);
+$rows = mysql_num_rows($result);
+if($rows > 0){
+	echo "Rows";
+}
+else {
+	echo "none";
+}
 ?>

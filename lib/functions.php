@@ -20,8 +20,10 @@ return $matterArray;
 function clearAuthorTables(){
 	$authors="DELETE FROM authors";
 	$papers="DELETE FROM papers";
+	$instance="DELETE FROM coAuthorInstance";
 	mysql_query($authors);
 	mysql_query($papers);
+	mysql_query($instance);
 	
 	
 }
