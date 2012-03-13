@@ -20,8 +20,10 @@ return $matterArray;
 function clearAuthorTables(){
 	$authors="DELETE FROM authors";
 	$papers="DELETE FROM papers";
+	$instance="DELETE FROM coAuthorInstance";
 	mysql_query($authors);
 	mysql_query($papers);
+	mysql_query($instance);
 	
 	
 }
@@ -172,5 +174,14 @@ function scoringTransform($row, $col){
 }	
 	return $coordinates=array($row,$col);
 }
-	
+function updateAuthorPosition(){
+//query to get doctor set, can really be from anywhere
+//query to get doctor set, can really be from anywhere
+$queryDoctors = "SELECT distinct paper, coAuthorPosition, query from coAuthorInstance where query!=''";
+$result = mysql_query($queryDoctors) or die(mysql_error());
+while($row=mysql_fetch_array($result)){
+	$updateQuery='UPDATE coAuthorInstance SET authorPosition='.$row['coAuthorPosition'].' WHERE paper='.$row['paper'];
+	mysql_query($updateQuery);
+	}
+}	
 ?>

@@ -10,12 +10,13 @@ include("lib/init.php");
 $Start = getTime(); 
 //remove old data
 clearAuthorTables();
-
+$authorID=1;
 //query to get doctor set, can really be from anywhere
-$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!=''";
+$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND (specialty LIKE '%Cardio%' OR specialty LIKE '%CD%')";
+echo $queryDoctors;
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
- 	$query='';
+  $query='';
   $query = $row['firstName']." ".$row['middleName']." ".$row['lastName']; //your query term
   print "<br>Searching for: $query\n";
   $params = array(
@@ -74,18 +75,35 @@ while($row=mysql_fetch_array($result)){
 				$countAuthors = 1;
 				//parse authors and insert them into DB
 			 	foreach($item->children() as $author){
-					$targetPhysician=$row['atomId'];;
+					$targetPhysician=$row['atomId'];
 					$physicianQuery='';
+					$authorIdentifier='';
 					if(stripos($author,$row['lastName'])===0){
-						
+						$authorIdentifier=$row['atomId'];
 						$physicianQuery=$query;
 					}	
 					if($countAuthors===$lastAuthor){
 						$countAuthors='500';
 					}
-						$insertAuthorQuery = "INSERT INTO authors (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";				
+					$testQuery= "SELECT id FROM authors WHERE name LIKE '".$author."'";
+					$resultAuthor=mysql_query($testQuery);
+					$rows = mysql_num_rows($resultAuthor);
+					if($rows > 0){
+						$authorRow=mysql_fetch_array($resultAuthor);
+						$author=$authorRow['id'];
+						echo $author." already in authors<br>";
+					}
+					else {
+						$insertAuthorQuery="INSERT INTO authors(id,name, atomId) VALUES ('".$authorID."','".$author."','".$authorIdentifier."')";
+						$author=$authorID;
+						$authorID++;
 						mysql_query($insertAuthorQuery);
-						echo $insertAuthorQuery;
+						
+					}
+					
+						$insertInstanceQuery = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";				
+						mysql_query($insertInstanceQuery);
+						echo $insertInstanceQuery."<br>";
 						$countAuthors++; 
 				}
 				
