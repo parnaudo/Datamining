@@ -14,7 +14,8 @@ $queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc wher
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   $middle=substr($row['middleName'],0,1);	
-  $query = $row['firstName']." ".$middle." ".$row['lastName']; //your query term
+  $first=substr($row['firstName'],0,1);
+  $query = $row['lastName']." ".$first.$middle; //your query term
   print "<br>Searching for: $query\n";
   $params = array(
     'db' => 'pubmed',

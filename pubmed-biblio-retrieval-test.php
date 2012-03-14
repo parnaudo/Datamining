@@ -15,8 +15,10 @@ clearAuthorTables();
 $queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!=''";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
- 	$query='';
-  $query = $row['firstName']." ".$row['middleName']." ".$row['lastName']; //your query term
+  $query='';
+  $middle=substr($row['middleName'],0,1);	
+  $first=substr($row['firstName'],0,1);
+  $query = $row['lastName']." ".$first.$middle; 
   print "<br>Searching for: $query\n";
   $params = array(
     'db' => 'pubmed',
@@ -25,7 +27,7 @@ while($row=mysql_fetch_array($result)){
     'usehistory' => 'y',
 	'tool' => 'SCUcitationminer',
 	'email' => 'parnaudo@scu.edu',
-    'term' => $query.  " [Full Author Name]",
+    'term' => $query.  " AND cardio",
     );
   
   $url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' . http_build_query($params);
