@@ -9,23 +9,39 @@ include("lib/init.php");
 
 $Start = getTime(); 
 //remove old data
-clearAuthorTables();
+//clearAuthorTables();
+$authorID=1;
 
 //query to get doctor set, can really be from anywhere
-$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where atomId=28882";
+$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND atomId=375193";
+echo $queryDoctors;
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
- 	
+  $query='';
+
   $query = $row['firstName']." ".$row['middleName']." ".$row['lastName']; //your query term
+
+//query to get doctor set, can really be from anywhere (specialty like '%cardio%' or specialty like '%CD%' )
+$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND (specialty like '%cardio%' or specialty like '%CD%' ) ";
+
+$result = mysql_query($queryDoctors) or die(mysql_error());
+while($row=mysql_fetch_array($result)){
+  $query='';
+  $middle=substr($row['middleName'],0,1);
+  echo $row['middleName']. " MIDDLE IS ".$middle;
+ $query = "(".$row['firstName']." ".$row['middleName']." ".$row['lastName']. "[Full Author Name] OR ".$row['firstName']." ".$middle." ".$row['lastName']."[FULL AUTHOR NAME])"; //your query term
+
   print "<br>Searching for: $query\n";
   $params = array(
     'db' => 'pubmed',
     'retmode' => 'xml',
-    'retmax' => 100,
+    'retmax' => 200,
     'usehistory' => 'y',
 	'tool' => 'SCUcitationminer',
 	'email' => 'parnaudo@scu.edu',
-    'term' => $query.  " [Full Author Name]",
+
+    'term' => $query.  " AND cardio",
+
     );
   
   $url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' . http_build_query($params);
@@ -39,7 +55,16 @@ while($row=mysql_fetch_array($result)){
   printf("Translated query: %s\n\n", $translated);
  //use each UID to query the esummary API and return all information on each article
   foreach($xml->IdList->Id as $uid){
-	  
+	  $paperQuery="SELECT id FROM papers where id=".$uid;
+	  $resultPaper=mysql_query($paperQuery);
+	  $paperFlag = mysql_num_rows($resultPaper);
+	  if($paperFlag > 0){
+		$paperUpdateQuery="  ";
+		 echo $uid."<BR>";
+		 echo $query; 
+		 echo  $updateQuery="UPDATE coAuthorInstance SET query='".$query."' WHERE paper=".$uid; 
+	  }
+	  else{
 	  $attributeName='';
 
 		$sumParams = array(
@@ -67,33 +92,44 @@ while($row=mysql_fetch_array($result)){
 				if(strpos($attributeName,"PubDate")===0){
 				$pubdate= $item[0];	
 			}
-		
+			
 			if(strpos($attributeName,"AuthorList")===0){
 				$lastAuthor=$item->count();
 				
 				$countAuthors = 1;
 				//parse authors and insert them into DB
 			 	foreach($item->children() as $author){
-					$targetPhysician=$row['atomId'];;
+					$targetPhysician=$row['atomId'];
 					$physicianQuery='';
+					$authorIdentifier='';
 					if(stripos($author,$row['lastName'])===0){
-						
+						$authorIdentifier=$row['atomId'];
 						$physicianQuery=$query;
+					}	
+					if($countAuthors===$lastAuthor){
+						$countAuthors='500';
 					}
-				
-					if($countAuthors===1 || $countAuthors===2){	
+					$testQuery= "SELECT id FROM authors WHERE name LIKE '%".$author."%'";
+					
+					$resultAuthor=mysql_query($testQuery);
+					$rows = mysql_num_rows($resultAuthor);
+					if($rows > 0){
+						$authorRow=mysql_fetch_array($resultAuthor);
+						$author=$authorRow['id'];
+						echo $author." already in authors<br>";
+					}
+					else {
+						$insertAuthorQuery="INSERT INTO authors(id,name, atomId) VALUES ('".$authorID."','".$author."','".$authorIdentifier."')";
+						$author=$authorID;
+						$authorID++;
+					//	mysql_query($insertAuthorQuery);
 						
-						$insertAuthorQuery = "INSERT INTO authors (author, paper, importantAuthor, atomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";
-					}
-					elseif($countAuthors===$lastAuthor){
-						$insertAuthorQuery = "INSERT INTO authors (author, paper, importantAuthor,atomId,query) VALUES ('".$author."','".$uid."','3','".$targetPhysician."','".$physicianQuery."')";
-					}
-					else{
-						$insertAuthorQuery = "INSERT INTO authors (author, paper,atomId,query) VALUES ('".$author."','".$uid."','".$targetPhysician."','".$physicianQuery."')";	
 					}
 					
-					mysql_query($insertAuthorQuery);
-					$countAuthors++; 
+						$insertInstanceQuery = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";				
+					//	mysql_query($insertInstanceQuery);
+						
+						$countAuthors++; 
 				}
 				
 			}
@@ -102,10 +138,10 @@ while($row=mysql_fetch_array($result)){
 	
 		}
 		$insertJournalQuery = "INSERT INTO papers (id, title, journal, numAuthors, pubDate) VALUES ('".$uid."','".$title."','".$journal."','".$lastAuthor."','".$pubdate."')";
-	
-  		mysql_query($insertJournalQuery);
-	
-	}
+		echo $insertJournalQuery."<BR>";
+  		//mysql_query($insertJournalQuery);
+	  }
+	}}
   }
 }
 $End = getTime(); 
