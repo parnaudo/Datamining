@@ -1,15 +1,12 @@
 <?php 
 include("lib/init.php");	
 $author="arnaudo pa";
-$noMiddleInitial="Laird J";
-$test=strpos($middleInitial," ");
-$testQuery= "SELECT id FROM authors WHERE name LIKE '".$author."'";
-$result=mysql_query($testQuery);
-$rows = mysql_num_rows($result);
-if($rows > 0){
-	echo "Rows";
-}
-else {
-	echo "none";
+$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND atomId=372548 ";
+
+$result = mysql_query($queryDoctors) or die(mysql_error());
+while($row=mysql_fetch_array($result)){
+  $query='';
+  $middle=substr($row['middleName'],0,1);
+  echo $row['middleName']. " MIDDLE IS ".$middle;
 }
 ?>

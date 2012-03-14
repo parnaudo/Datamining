@@ -11,13 +11,15 @@ $Start = getTime();
 //remove old data
 clearAuthorTables();
 $authorID=1;
-//query to get doctor set, can really be from anywhere
-$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND (specialty LIKE '%Cardio%' OR specialty LIKE '%CD%')";
-echo $queryDoctors;
+//query to get doctor set, can really be from anywhere (specialty like '%cardio%' or specialty like '%CD%' )
+$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND (specialty like '%cardio%' or specialty like '%CD%' ) ";
+
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   $query='';
-  $query = $row['firstName']." ".$row['middleName']." ".$row['lastName']; //your query term
+  $middle=substr($row['middleName'],0,1);
+  echo $row['middleName']. " MIDDLE IS ".$middle;
+ $query = "(".$row['firstName']." ".$row['middleName']." ".$row['lastName']. "[Full Author Name] OR ".$row['firstName']." ".$middle." ".$row['lastName']."[FULL AUTHOR NAME])"; //your query term
   print "<br>Searching for: $query\n";
   $params = array(
     'db' => 'pubmed',
@@ -26,7 +28,7 @@ while($row=mysql_fetch_array($result)){
     'usehistory' => 'y',
 	'tool' => 'SCUcitationminer',
 	'email' => 'parnaudo@scu.edu',
-    'term' => $query.  " [Full Author Name]",
+    'term' => $query.  "  AND cardio ",
     );
   
   $url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' . http_build_query($params);
@@ -85,7 +87,8 @@ while($row=mysql_fetch_array($result)){
 					if($countAuthors===$lastAuthor){
 						$countAuthors='500';
 					}
-					$testQuery= "SELECT id FROM authors WHERE name LIKE '".$author."'";
+					$testQuery= "SELECT id FROM authors WHERE name LIKE '%".$author."%'";
+					
 					$resultAuthor=mysql_query($testQuery);
 					$rows = mysql_num_rows($resultAuthor);
 					if($rows > 0){
@@ -103,7 +106,7 @@ while($row=mysql_fetch_array($result)){
 					
 						$insertInstanceQuery = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";				
 						mysql_query($insertInstanceQuery);
-						echo $insertInstanceQuery."<br>";
+						
 						$countAuthors++; 
 				}
 				
@@ -113,7 +116,7 @@ while($row=mysql_fetch_array($result)){
 	
 		}
 		$insertJournalQuery = "INSERT INTO papers (id, title, journal, numAuthors, pubDate) VALUES ('".$uid."','".$title."','".$journal."','".$lastAuthor."','".$pubdate."')";
-		echo $insertJournalQuery;
+		echo $insertJournalQuery."<BR>";
   		mysql_query($insertJournalQuery);
 	
 	}
