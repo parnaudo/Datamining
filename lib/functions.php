@@ -64,6 +64,7 @@ function createAttributesTable($insertTable){
   `menumber` varchar(11) DEFAULT NULL,
   `fellowshipyear` int(11) DEFAULT NULL,
   `specialty` varchar(100) DEFAULT NULL,
+  `hospital` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4279 DEFAULT CHARSET=latin1;
 ";
