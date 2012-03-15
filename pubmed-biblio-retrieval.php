@@ -9,20 +9,14 @@ include("lib/init.php");
 
 $Start = getTime(); 
 //remove old data
-//clearAuthorTables();
+clearAuthorTables();
 $authorID=1;
 
 //query to get doctor set, can really be from anywhere
-$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND atomId=375193";
-echo $queryDoctors;
-$result = mysql_query($queryDoctors) or die(mysql_error());
-while($row=mysql_fetch_array($result)){
-  $query='';
 
-  $query = $row['firstName']." ".$row['middleName']." ".$row['lastName']; //your query term
 
 //query to get doctor set, can really be from anywhere (specialty like '%cardio%' or specialty like '%CD%' )
-$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND (specialty like '%cardio%' or specialty like '%CD%' ) ";
+$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND atomId IN (28786,32799,365390,28572)";
 
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
@@ -55,16 +49,7 @@ while($row=mysql_fetch_array($result)){
   printf("Translated query: %s\n\n", $translated);
  //use each UID to query the esummary API and return all information on each article
   foreach($xml->IdList->Id as $uid){
-	  $paperQuery="SELECT id FROM papers where id=".$uid;
-	  $resultPaper=mysql_query($paperQuery);
-	  $paperFlag = mysql_num_rows($resultPaper);
-	  if($paperFlag > 0){
-		$paperUpdateQuery="  ";
-		 echo $uid."<BR>";
-		 echo $query; 
-		 echo  $updateQuery="UPDATE coAuthorInstance SET query='".$query."' WHERE paper=".$uid; 
-	  }
-	  else{
+
 	  $attributeName='';
 
 		$sumParams = array(
@@ -99,11 +84,13 @@ while($row=mysql_fetch_array($result)){
 				$countAuthors = 1;
 				//parse authors and insert them into DB
 			 	foreach($item->children() as $author){
+					$authorMatch=0;
 					$targetPhysician=$row['atomId'];
 					$physicianQuery='';
 					$authorIdentifier='';
 					if(stripos($author,$row['lastName'])===0){
 						$authorIdentifier=$row['atomId'];
+						$authorMatch=1;
 						$physicianQuery=$query;
 					}	
 					if($countAuthors===$lastAuthor){
@@ -113,7 +100,7 @@ while($row=mysql_fetch_array($result)){
 					
 					$resultAuthor=mysql_query($testQuery);
 					$rows = mysql_num_rows($resultAuthor);
-					if($rows > 0){
+					if($rows > 0 ){
 						$authorRow=mysql_fetch_array($resultAuthor);
 						$author=$authorRow['id'];
 						echo $author." already in authors<br>";
@@ -122,14 +109,30 @@ while($row=mysql_fetch_array($result)){
 						$insertAuthorQuery="INSERT INTO authors(id,name, atomId) VALUES ('".$authorID."','".$author."','".$authorIdentifier."')";
 						$author=$authorID;
 						$authorID++;
-					//	mysql_query($insertAuthorQuery);
+						mysql_query($insertAuthorQuery);
 						
 					}
+					 $paperQuery="SELECT id FROM papers where id=".$uid;
+					 $resultPaper=mysql_query($paperQuery);
+					 $paperFlag = mysql_num_rows($resultPaper);
+	 				if($paperFlag > 0 && $authorMatch > 0){
+							$paperUpdateQuery="  ";
+
+							$updateQuery="UPDATE coAuthorInstance SET query='".$query."' WHERE paper=".$uid." AND coAuthor='".$author."'"; 
+							echo $updateQuery."<BR>";
+					  		mysql_query($updateQuery);
+	 					 }
+					elseif($paperFlag > 0){
+							echo "NON SET DOCTOR HERE <BR>";	
+						
+					}
+	 				 else{
 					
 						$insertInstanceQuery = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";				
-					//	mysql_query($insertInstanceQuery);
+						mysql_query($insertInstanceQuery);
 						
 						$countAuthors++; 
+					}
 				}
 				
 			}
@@ -139,11 +142,12 @@ while($row=mysql_fetch_array($result)){
 		}
 		$insertJournalQuery = "INSERT INTO papers (id, title, journal, numAuthors, pubDate) VALUES ('".$uid."','".$title."','".$journal."','".$lastAuthor."','".$pubdate."')";
 		echo $insertJournalQuery."<BR>";
-  		//mysql_query($insertJournalQuery);
-	  }
-	}}
+  		mysql_query($insertJournalQuery);
+	  
+	}
   }
 }
+updateAuthorPosition();
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs";
 ?>
