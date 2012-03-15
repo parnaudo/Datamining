@@ -3,27 +3,27 @@
 /*
 This script accepts as an input a list of authors names and queries the pubmed database for all the papers attributed to the author. It then parses all the authors listed on the paper, marks the first, second and last author and records them to a sepaarate table. 
 
-Written by Paul Arnaudo 2/17/12 
+Written by Paul Arnaudo 3/10/12 
 */
 include("lib/init.php");	
 
 $Start = getTime(); 
-//remove old data
+//remove old data from tables
 clearAuthorTables();
 $authorID=1;
 
-//query to get doctor set, can really be from anywhere
 
 
-//query to get doctor set, can really be from anywhere (specialty like '%cardio%' or specialty like '%CD%' )
+
+//query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
 $queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND atomId IN (28786,32799,365390,28572)";
 
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   $query='';
   $middle=substr($row['middleName'],0,1);
-  echo $row['middleName']. " MIDDLE IS ".$middle;
- $query = "(".$row['firstName']." ".$row['middleName']." ".$row['lastName']. "[Full Author Name] OR ".$row['firstName']." ".$middle." ".$row['lastName']."[FULL AUTHOR NAME])"; //your query term
+ 
+ $query = "(".$row['firstName']." ".$row['middleName']." ".$row['lastName']. "[Full Author Name] OR ".$row['firstName']." ".$middle." ".$row['lastName']."[FULL AUTHOR NAME])"; //your query term, searches for both middle name and middle initial
 
   print "<br>Searching for: $query\n";
   $params = array(
@@ -35,7 +35,7 @@ while($row=mysql_fetch_array($result)){
 	'email' => 'parnaudo@scu.edu',
 
     'term' => $query.  " AND cardio",
-
+//also can add MeSH terms here for more granularity
     );
   
   $url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' . http_build_query($params);
@@ -88,6 +88,7 @@ while($row=mysql_fetch_array($result)){
 					$targetPhysician=$row['atomId'];
 					$physicianQuery='';
 					$authorIdentifier='';
+					//identifies author from my data set
 					if(stripos($author,$row['lastName'])===0){
 						$authorIdentifier=$row['atomId'];
 						$authorMatch=1;
@@ -100,6 +101,7 @@ while($row=mysql_fetch_array($result)){
 					
 					$resultAuthor=mysql_query($testQuery);
 					$rows = mysql_num_rows($resultAuthor);
+					//checks to see if author has already been inputted
 					if($rows > 0 ){
 						$authorRow=mysql_fetch_array($resultAuthor);
 						$author=$authorRow['id'];
@@ -112,22 +114,23 @@ while($row=mysql_fetch_array($result)){
 						mysql_query($insertAuthorQuery);
 						
 					}
+					//check to see if paper is already in paper table
 					 $paperQuery="SELECT id FROM papers where id=".$uid;
 					 $resultPaper=mysql_query($paperQuery);
 					 $paperFlag = mysql_num_rows($resultPaper);
 	 				if($paperFlag > 0 && $authorMatch > 0){
 							$paperUpdateQuery="  ";
-
+							
 							$updateQuery="UPDATE coAuthorInstance SET query='".$query."' WHERE paper=".$uid." AND coAuthor='".$author."'"; 
 							echo $updateQuery."<BR>";
 					  		mysql_query($updateQuery);
 	 					 }
 					elseif($paperFlag > 0){
-							echo "NON SET DOCTOR HERE <BR>";	
+							//instance already created, no need 	
 						
 					}
 	 				 else{
-					
+						//create new instance for doctor & paper
 						$insertInstanceQuery = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";				
 						mysql_query($insertInstanceQuery);
 						
@@ -140,6 +143,8 @@ while($row=mysql_fetch_array($result)){
 
 	
 		}
+		//insert into paper 
+		
 		$insertJournalQuery = "INSERT INTO papers (id, title, journal, numAuthors, pubDate) VALUES ('".$uid."','".$title."','".$journal."','".$lastAuthor."','".$pubdate."')";
 		echo $insertJournalQuery."<BR>";
   		mysql_query($insertJournalQuery);
@@ -147,6 +152,7 @@ while($row=mysql_fetch_array($result)){
 	}
   }
 }
+//function for my purposes of identifying author positions to compare with other authors
 updateAuthorPosition();
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs";
