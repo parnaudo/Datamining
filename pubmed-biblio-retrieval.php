@@ -16,7 +16,7 @@ $authorID=1;
 
 
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
-$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND atomId IN (28786,32799,365390,28572)";
+$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND (specialty like '%CD%' OR specialty LIKE '%cardio%')";
 
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
@@ -120,9 +120,10 @@ while($row=mysql_fetch_array($result)){
 					 $paperFlag = mysql_num_rows($resultPaper);
 	 				if($paperFlag > 0 && $authorMatch > 0){
 							$paperUpdateQuery="  ";
-							
+							$updateAuthorQuery="UPDATE authors set atomId='".$authorIdentifier."' WHERE id='".$author."'";
+							//echo $updateAuthorQuery."<BR>";
 							$updateQuery="UPDATE coAuthorInstance SET query='".$query."' WHERE paper=".$uid." AND coAuthor='".$author."'"; 
-							echo $updateQuery."<BR>";
+							mysql_query($updateAuthorQuery);
 					  		mysql_query($updateQuery);
 	 					 }
 					elseif($paperFlag > 0){

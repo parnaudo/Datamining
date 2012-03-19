@@ -1,9 +1,9 @@
 <?php
 
 /*
-This script accepts as an input a list of authors names and queries the pubmed database for all the papers attributed to the author. It then parses all the authors listed on the paper, marks the first, second and last author and records them to a sepaarate table. 
+This script builds relationship scores based off of authorship instances mined from pubmed.
 
-Written by Paul Arnaudo 2/17/12 
+Written by Paul Arnaudo 3/19/12 
 */
 include("lib/init.php");	
 $table='relationship';
@@ -24,45 +24,48 @@ $scoringArray=array( array(NULL,1,2,500,'x'),
 					
 
 clearTable($table);
-$getRelationships="SELECT distinct  coAuthor, authorAtomId from coAuthorInstance where query='' and authorAtomId=82387 order by authorAtomId,coAuthor DESC";
-$result=mysql_query($getRelationships);
-//Get distinct author and coauthor records
+$getPapers="SELECT DISTINCT `authors`.id,paper,numAuthors,authorPosition FROM coauthorinstance INNER JOIN authors ON coAuthor=authors.id INNER JOIN papers ON papers.id=coauthorinstance.paper WHERE atomId!=0";
+$result=mysql_query($getPapers);
+//Get distinct information on authors we are looking to search for
 while($row=mysql_fetch_array($result)){
-	$insertQuery='';
-	//see if its the same name without a middle initial
-	if(stripos($lastEntry,$row['coAuthor'])===0){
-		$matchFlag=1;
-		
-	}
-	else{
-		$matchFlag=0;
-		$insertQuery="INSERT INTO relationship (coAuthor,authorAtom) VALUES ('".$row['coAuthor']."','".$row['authorAtomId']."')";
-	}
-	//insert into relationship table
-	mysql_query($insertQuery);
-	
-	$coAuthorQuery="SELECT numAuthors, coAuthorPosition, authorPosition from coAuthorInstance INNER JOIN papers on papers.id=paper  where query='' AND coAuthor='".$row['coAuthor']."' AND authorAtomId=".$row['authorAtomId'];
-	echo $coAuthorQuery;
-	$coAuthorResult=mysql_query($coAuthorQuery);
-
-	//get all coauthor instances with author and coauthor
-	while($rowauthor=mysql_fetch_array($coAuthorResult)){
-		$numAuthorModifier= round(1/($rowauthor['numAuthors']-1),2);
-		$coordinates = scoringTransform($rowauthor['coAuthorPosition'],$rowauthor['authorPosition']);
-		$score=$scoringArray[$coordinates[0]][$coordinates[1]];
-		$score=($score*$numAuthorModifier)*10;
-		if($matchFlag===1){
-			$updateQuery="UPDATE relationship SET relationship = (relationship + ".$score."),paperCount=(paperCount+1) WHERE coAuthor='".$lastEntry."' AND authorAtom=".$row['authorAtomId'];
+	$author=$row['id'];
+	$paper=$row['paper'];
+	$numAuthors=$row['numAuthors'];
+	$authorPosition=$row['authorPosition'];
+	$getInstances="SELECT coAuthor, coAuthorPosition,query FROM coauthorinstance where paper='".$paper."' AND coAuthorPosition!='".$authorPosition."' ";
+	$instanceResult=mysql_query($getInstances);
+//GET all distinct coauthor information for each author id and paper
+	while($rowInstance=mysql_fetch_array($instanceResult)){
+		if($rowInstance['query']!=''){
+			$targetDocFlag=1;	
 		}
 		else{
-			$updateQuery="UPDATE relationship SET relationship = (relationship + ".$score."),paperCount=(paperCount+1) WHERE coAuthor='".$row['coAuthor']."' AND authorAtom=".$row['authorAtomId'];
+			$targetDocFlag=0;	
 		}
-		echo $updateQuery."<BR>";
-		mysql_query($updateQuery);
-	
-		
+		$numAuthorModifier= round(1/($numAuthors-1),2);
+		$coordinates = scoringTransform($rowInstance['coAuthorPosition'],$authorPosition);
+		$score=$scoringArray[$coordinates[0]][$coordinates[1]];
+		echo "AUTHOR POS: ".$authorPosition." COAUTHOR POS: ".$rowInstance['coAuthorPosition']."SCORE.".$score. " NUM AUTHOR MOD: ".$numAuthorModifier. " PAPER ID: ".$paper."<BR>";
+		$score=($score*$numAuthorModifier)*10;
+		$relationTest= "SELECT id FROM relationship WHERE coAuthor=".$rowInstance['coAuthor']." AND authorAtom=".$author;
+		$resultRelation=mysql_query($relationTest);
+		$relationFlag = mysql_num_rows($resultRelation);
+//Look for instances already
+		if($relationFlag > 0 ){
+			$rowRelation=mysql_fetch_array($resultRelation);
+			$relation=$rowRelation['id'];
+			$updateRelationQuery="UPDATE relationship SET relationship= (relationship + ".$score."), paperCount=(paperCount+1) WHERE id=".$rowRelation['id'];
+			//echo $updateRelationQuery."<br>";
+			mysql_query($updateRelationQuery);
+			}	
+	    else {
+			$insertRelationQuery="INSERT INTO relationship (coAuthor, authorAtom, relationship, paperCount,targetDoc) VALUES ('".$rowInstance['coAuthor']."','".$author."','".$score."','1','".$targetDocFlag."')";
+			//echo $insertRelationQuery."<BR>";
+			mysql_query($insertRelationQuery);			
+			}
 	}
-	$lastEntry=$row['coAuthor'];
+
+
 }				
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." seconds";
