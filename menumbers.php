@@ -18,7 +18,7 @@ function linkMEnumber($searchstring){
 			$medschoolResult = mysql_query($getMedschool) or die(mysql_error());
 			$rowMedschool = mysql_fetch_array($medschoolResult);
 			if($rowMedschool['value']!=''){
-				$schoolID=substr($row['value'],0,5);
+				$schoolID=substr($row['value'],0,4);
 				
 				if(in_array($rowMedschool['value'],$MEinfo)){
 					echo $rowMedschool['value']. " Already in array";
