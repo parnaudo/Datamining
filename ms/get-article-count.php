@@ -24,9 +24,8 @@ $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   $query='';
   $count=0;
- $middle=substr($row['middleName'],0,1);
  
- $query = "(".$row['firstName']." ".$row['middleName']." ".$row['lastName']. "[Full Author Name] OR ".$row['firstName']." ".$middle." ".$row['lastName']."[FULL AUTHOR NAME])"; //your query term, searches for both middle name and middle initial
+  $query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']); //your query term, searches for both middle name and middle initial
 
 
   print "<br>Searching for: $query\n";
@@ -38,22 +37,15 @@ while($row=mysql_fetch_array($result)){
 	'tool' => 'SCUcitationminer',
 	'email' => 'parnaudo@scu.edu',
 
-    'term' => $query.  " AND MULTIPLE SCLEROSIS [MESH FIELDS]",
+    'term' => $query.  " AND (MULTIPLE SCLEROSIS [MESH FIELDS] OR MULTIPLE SCLEROSIS [Journal] OR MULTIPLE SCLEROSIS [Title])",
 //also can add MeSH terms here for more granularity
     );
   
   $url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' . http_build_query($params);
-  
-
+ 
    //Retrieve the pubmed UIDs to then retrieve summaries for
   $xml = simplexml_load_file($url);
   $count= (int) $xml->Count;
-
-  
-=======
- // echo $row['firstName']." ".$row['lastName']. " papers written: ". $count."<BR>"; 
->>>>>>> 250abde176ac6f44b71969ba987c8ec5e20b00eb
-//  echo $xml ->Count;
   $updateQuery="UPDATE neurologist SET paperCount=".$count." WHERE id=".$row['id'];
   mysql_query($updateQuery);
 

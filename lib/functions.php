@@ -185,4 +185,10 @@ while($row=mysql_fetch_array($result)){
 	mysql_query($updateQuery);
 	}
 }	
+function authorPubmedTransform($first,$middle,$last){
+	 $middle=substr($middle,0,1);
+ 	 $first=substr($first,0,1);	
+ 	 $query = "(".$last." ".$first.$middle. "[author])";
+ 	 return $query;
+}
 ?>

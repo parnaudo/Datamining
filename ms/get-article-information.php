@@ -16,13 +16,17 @@ $authorID=1;
 
 
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
-$queryDoctors = "SELECT * FROM `neurologist` where paperCount >= 5";
+$queryDoctors = "SELECT * FROM `neurologist` where id=1386621670";
 
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   $query='';
   $count=0;
- $query = "(".$row['firstName']." ".$row['lastName']. "[Full Author Name])"; //your query term, searches for both middle name and middle initial
+
+
+$query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']); //your query term, searches for both middle name and middle initial
+
+
 
   print "<br>Searching for: $query\n";
   $params = array(

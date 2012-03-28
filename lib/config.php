@@ -3,7 +3,7 @@
 $CFG->dbname = "zephyr";
 	$CFG->dbuser = "root";
 
-	$CFG->dbpass = 'rubberbabybuggybumpers';
+	$CFG->dbpass = 'root';
 
 	$CFG->dbtype = 'mysql';
 	$CFG->dbhost = 'localhost';
