@@ -16,7 +16,7 @@ $authorID=1;
 
 
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
-$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where lastName!='' AND (specialty like '%CD%' OR specialty LIKE '%cardio%')";
+$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where atomId=365390";
 
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
@@ -40,7 +40,7 @@ while($row=mysql_fetch_array($result)){
   
   $url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' . http_build_query($params);
   
-
+	
    //Retrieve the pubmed UIDs to then retrieve summaries for
   $xml = simplexml_load_file($url);
 
@@ -59,7 +59,7 @@ while($row=mysql_fetch_array($result)){
     	'id' => $uid,
    		 );
 	  $bibliourl= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?". http_build_query($sumParams,'','&'); 
-  		
+  	  echo $bibliourl;
 	  $bibliourl=str_replace('%5B0%5D','',$bibliourl);
 	  $biblioxml = simplexml_load_file($bibliourl);
   	  foreach( $biblioxml->children() as $docsum){
