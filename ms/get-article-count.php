@@ -16,13 +16,18 @@ $authorID=1;
 
 
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
+
 $queryDoctors = "SELECT * FROM `neurologist`";
+
 
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   $query='';
   $count=0;
- $query = "(".$row['firstName']." ".$row['lastName']. "[Full Author Name])"; //your query term, searches for both middle name and middle initial
+ $middle=substr($row['middleName'],0,1);
+ 
+ $query = "(".$row['firstName']." ".$row['middleName']." ".$row['lastName']. "[Full Author Name] OR ".$row['firstName']." ".$middle." ".$row['lastName']."[FULL AUTHOR NAME])"; //your query term, searches for both middle name and middle initial
+
 
   print "<br>Searching for: $query\n";
   $params = array(
@@ -43,7 +48,11 @@ while($row=mysql_fetch_array($result)){
    //Retrieve the pubmed UIDs to then retrieve summaries for
   $xml = simplexml_load_file($url);
   $count= (int) $xml->Count;
+
   
+=======
+ // echo $row['firstName']." ".$row['lastName']. " papers written: ". $count."<BR>"; 
+>>>>>>> 250abde176ac6f44b71969ba987c8ec5e20b00eb
 //  echo $xml ->Count;
   $updateQuery="UPDATE neurologist SET paperCount=".$count." WHERE id=".$row['id'];
   mysql_query($updateQuery);
