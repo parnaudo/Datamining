@@ -5,8 +5,8 @@ This script attempts to reconcile me numbers and their schools. Without having a
 */
 include("lib/init.php");	 
 $count=0;
-
-function linkMEnumber($searchstring){
+$table="universitymenumbers";
+function linkMEnumber($searchstring,$table){
 	$sql="select name,particles.value, particles.atomId FROM particles inner join matters on matters.matterId=particles.matterId where matters.name like '%$searchstring%'";
 	$result = mysql_query($sql) or die(mysql_error());
 	$numRows = mysql_num_rows($result);
@@ -26,7 +26,7 @@ function linkMEnumber($searchstring){
 				}
 				else{
 					$MEinfo = array("menumber" => strval($schoolID), "university"=>$rowMedschool['value']);
-					$insertQuery="INSERT INTO universitymenumbers (menumber, universityname,atomId) VALUES ('".$schoolID."', '".$MEinfo['university']."', '".$row['atomId']."')";
+					$insertQuery="INSERT INTO ".$table." (menumber, universityname,atomId) VALUES ('".$schoolID."', '".$MEinfo['university']."', '".$row['atomId']."')";
 					mysql_query($insertQuery);
 					echo $insertQuery;
 					echo "<br>";
@@ -40,6 +40,7 @@ function linkMEnumber($searchstring){
 	}
 	echo $numRows. " results with ".$count." medical education number hits";
 }
+clearTable($table);
 //createMETable("universitymenumbers");
 linkMEnumber(me_number);
 linkMEnumber(menumber);

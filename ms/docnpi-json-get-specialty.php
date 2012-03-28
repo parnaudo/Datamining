@@ -4,7 +4,7 @@ This script accepts a list of names and zipcodes and attempts to identify their 
 
 Written by Paul Arnaudo 2/24/12 
 */
-include("lib/init.php");	
+include("../lib/init.php");	
 $Start = getTime(); 
 $count=0;
 //target set
