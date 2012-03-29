@@ -9,7 +9,7 @@ include("../lib/init.php");
 
 $Start = getTime(); 
 //remove old data from tables
-clearAuthorTables();
+//clearAuthorTables();
 $authorID=1;
 
 
@@ -17,7 +17,7 @@ $authorID=1;
 
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
 
-$queryDoctors = "SELECT * FROM `neurologist`";
+$queryDoctors = "SELECT * FROM `neurologist` where paperCount!=0";
 
 
 $result = mysql_query($queryDoctors) or die(mysql_error());
@@ -25,8 +25,10 @@ while($row=mysql_fetch_array($result)){
   $query='';
   $count=0;
  
-  $query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']); //your query term, searches for both middle name and middle initial
-
+  //$query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']); //your query term, searches for both middle name and middle initial
+  $middle=substr($row['middleName'],0,1);
+ 
+  $query = "(".$row['firstName']." ".$row['middleName']." ".$row['lastName']. "[Full Author Name] OR ".$row['firstName']." ".$middle." ".$row['lastName']."[FULL AUTHOR NAME])"; 
 
   print "<br>Searching for: $query\n";
   $params = array(
@@ -46,7 +48,7 @@ while($row=mysql_fetch_array($result)){
    //Retrieve the pubmed UIDs to then retrieve summaries for
   $xml = simplexml_load_file($url);
   $count= (int) $xml->Count;
-  $updateQuery="UPDATE neurologist SET paperCount=".$count." WHERE id=".$row['id'];
+  $updateQuery="UPDATE neurologist SET paperCountFullAuthor=".$count." WHERE id=".$row['id'];
   mysql_query($updateQuery);
 
 }
