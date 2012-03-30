@@ -35,7 +35,9 @@
 				return $papers;
 	
 			}
-		}		
+		}
+		
+//accepts a UID and returns a multi-dimensional array with all the desired paper fields along with all coauthors. More fields can be added from pubmed if required.			
 		function eSummary($uid){
 			
 			$sumParams = array(
@@ -50,9 +52,10 @@
 			 $xml = simplexml_load_file($url);
   	  		foreach( $xml->children() as $docsum){
   	  		
-		 //XML that describes the articles 
+ //XML that describes the articles 
 				foreach($docsum->children() as $item){	
 					$attributeName = $item->attributes();
+//add more fields from the XML if desired					
 					if(strpos($attributeName,"FullJournalName")===0){
 						$journal = $item[0];	
 					}
@@ -65,7 +68,7 @@
 					if(strpos($attributeName,"AuthorList")===0){
 						$lastAuthor=$item->count();
 						$countAuthors = 1;
-					//get position and name of each author, stick it in arrat
+//get position and name of each author, stick it in array
 			 			foreach($item->children() as $author){
 							if($countAuthors===$lastAuthor){
 								$countAuthors='500';
@@ -81,6 +84,7 @@
 					}
 				}
 			}
+			
 			$paperInfo=array(
 				'journal'=> $journal,
 				'title'=> $title,
