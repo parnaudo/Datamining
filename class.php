@@ -49,7 +49,7 @@
    		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?". http_build_query($sumParams,'','&'); 
   		     
 	
-			 $xml = simplexml_load_file($url);
+			$xml = simplexml_load_file($url);
   	  		foreach( $xml->children() as $docsum){
   	  		
  //XML that describes the articles 
@@ -95,9 +95,25 @@
 			);
 			return $paperInfo;
 		}
-		function eFetch(){
+		function eFetch($uid){
+			$sumParams = array(
+   		 		'db' => 'pubmed',
+				'tool' => 'SCUcitationminer',
+				'email' => 'parnaudo@scu.edu',
+				'retmode' => 'xml',
+    			'id' => $uid,
+   		 	);
+   		 	
+   		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?". http_build_query($sumParams,'','&'); 
+		echo $url;
+			$xml = simplexml_load_file($url);
+  	  		foreach( $xml->children() as $docsum){	
+ //parse XML  	
+  	  		
+				print_r($docsum);
+			 				
 		
-		
+			}
 		}
 	
 		function npi(){
@@ -110,8 +126,8 @@
 	$array=array("Waxman SG [AUTHOR]","MULTIPLE SCLEROSIS [MESH FIELDS]");
 	$test=new dataMiner();
 	
-	$arrayTest=$test->eSummary("4314823");
-	foreach($arrayTest as $info){
+	$arrayTest=$test->eFetch("4314823");
+/*	foreach($arrayTest as $info){
 		
 		if(is_array($info)==1){
 		  	foreach($info as $authors){
@@ -123,5 +139,5 @@
 		}
 	
 	}
-
+*/
 ?>

@@ -3,7 +3,7 @@ include("lib/init.php");
 $Start = getTime(); 
 $row = 1;
 //Open input CSV
-if (($handle = fopen("endopubtolookup.csv", "r")) !== FALSE) {
+if (($handle = fopen("exampledataTest.csv", "r")) !== FALSE) {
     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
         $queryString='';
 

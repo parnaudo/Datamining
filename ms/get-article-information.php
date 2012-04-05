@@ -16,7 +16,7 @@ $authorID=1;
 
 
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
-$queryDoctors = "SELECT * FROM `neurologist` where id=1386621670";
+$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
 
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
@@ -96,24 +96,31 @@ $query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName
 						$authorIdentifier=$row['id'];
 						$authorMatch=1;
 						$physicianQuery=$query;
+						
 					}	
 					if($countAuthors===$lastAuthor){
 						$countAuthors='500';
 					}
 					$testQuery= "SELECT id FROM authors WHERE name LIKE '%".$author."%'";
-					
+					//echo $testQuery;
 					$resultAuthor=mysql_query($testQuery);
 					$rows = mysql_num_rows($resultAuthor);
 					//checks to see if author has already been inputted
 					if($rows > 0 ){
 						$authorRow=mysql_fetch_array($resultAuthor);
 						$author=$authorRow['id'];
-						echo $author." already in authors<br>";
+						//echo $author." already in authors<br>";
 					}
 					else {
+						if($authorMatch > 0){
+						$insertAuthorQuery="INSERT INTO authors(id,name, atomId) VALUES ('".$authorIdentifier."','".$author."','".$authorIdentifier."')";
+						$author=$authorID;						
+						echo $insertAuthorQuery;
+						}
+						else{
 						$insertAuthorQuery="INSERT INTO authors(id,name, atomId) VALUES ('".$authorID."','".$author."','".$authorIdentifier."')";
-						
 						$author=$authorID;
+						}
 						$authorID++;
 						mysql_query($insertAuthorQuery);
 						
@@ -124,11 +131,13 @@ $query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName
 					 $paperFlag = mysql_num_rows($resultPaper);
 	 				if($paperFlag > 0 && $authorMatch > 0){
 							$paperUpdateQuery="  ";
-							$updateAuthorQuery="UPDATE authors set atomId='".$authorIdentifier."' WHERE id='".$author."'";
-							//echo $updateAuthorQuery."<BR>";
+							$updateAuthorQuery="UPDATE authors set id='".$authorIdentifier."', atomId='".$authorIdentifier."' WHERE id='".$author."'";
+							echo $updateAuthorQuery."<BR>";
 							$updateQuery="UPDATE coAuthorInstance SET query='".$query."' WHERE paper=".$uid." AND coAuthor='".$author."'"; 
 							mysql_query($updateAuthorQuery);
 					  		mysql_query($updateQuery);
+					  		$cleanUpQuery="UPDATE coAuthorInstance SET coAuthor='".$authorIdentifier."' WHERE coAuthor='".$author."'";
+					  		mysql_query($cleanUpQuery);
 	 					 }
 					elseif($paperFlag > 0){
 							//instance already created, no need 	
@@ -151,7 +160,7 @@ $query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName
 		//insert into paper 
 		
 		$insertJournalQuery = "INSERT INTO papers (id, title, journal, numAuthors, pubDate) VALUES ('".$uid."','".$title."','".$journal."','".$lastAuthor."','".$pubdate."')";
-		echo $insertJournalQuery."<BR>";
+		//echo $insertJournalQuery."<BR>";
   		mysql_query($insertJournalQuery);
 	  
 	}

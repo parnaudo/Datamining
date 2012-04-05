@@ -15,10 +15,10 @@ $matchFlag=0;
 
 //query to get doctor set, can really be from anywhere
 $scoringArray=array( array(NULL,1,2,500,'x'),
-					 array(1,NULL,.8,.6,.2),
-					 array(2,.8,NULL,.4,.1),
-					 array(500,.6,.4,NULL,.1),
-					 array('x',.2,.1,.1,.05)
+					 array(1,NULL,10,8,6),
+					 array(2,10,NULL,4,3),
+					 array(500,8,4,NULL,2),
+					 array('x',6,3,2,1)
 					);
 
 					
@@ -46,7 +46,7 @@ while($row=mysql_fetch_array($result)){
 		$coordinates = scoringTransform($rowInstance['coAuthorPosition'],$authorPosition);
 		$score=$scoringArray[$coordinates[0]][$coordinates[1]];
 		echo "AUTHOR POS: ".$authorPosition." COAUTHOR POS: ".$rowInstance['coAuthorPosition']."SCORE.".$score. " NUM AUTHOR MOD: ".$numAuthorModifier. " PAPER ID: ".$paper."<BR>";
-		$score=($score*$numAuthorModifier)*10;
+		$score=($score*$numAuthorModifier);
 		$relationTest= "SELECT id FROM relationship WHERE coAuthor=".$rowInstance['coAuthor']." AND authorAtom=".$author;
 		$resultRelation=mysql_query($relationTest);
 		$relationFlag = mysql_num_rows($resultRelation);
