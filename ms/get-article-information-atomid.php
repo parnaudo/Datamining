@@ -19,7 +19,7 @@ $authorID=1;
 
 
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
-$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
+$queryDoctors = "select * from neurologist where id=1447207154";
 //$queryDoctors = "select * from neurologist where id=1174581250";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
@@ -144,7 +144,7 @@ while($row=mysql_fetch_array($result)){
 	 				if($paperFlag > 0 && $authorMatch > 0){
 							$paperUpdateQuery="  ";
 							$updateAuthorQuery="UPDATE authors set  atomId='".$authorIdentifier."' WHERE id='".$author."'";
-							echo $updateAuthorQuery."<BR>";
+							//echo $updateAuthorQuery."<BR>";
 							$updateQuery="UPDATE coAuthorInstance SET query='".$query."' WHERE paper=".$uid." AND coAuthor='".$author."'"; 
 							mysql_query($updateAuthorQuery);
 					  		mysql_query($updateQuery);
@@ -155,7 +155,7 @@ while($row=mysql_fetch_array($result)){
 					}
 	 				 else{
 						//create new instance for doctor & paper
-						$insertInstanceQuery = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";				
+						$insertInstanceQuery = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";							echo $insertInstanceQuery "<br>";
 						mysql_query($insertInstanceQuery);
 						
 						$countAuthors++; 

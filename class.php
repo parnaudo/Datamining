@@ -108,10 +108,11 @@
 		echo $url;
 			$xml = simplexml_load_file($url);
   	  		foreach( $xml->children() as $docsum){	
- //parse XML  	
-  	  		
-				print_r($docsum);
-			 				
+ //parse XML	foreach($docsum->children() as $item){	
+					$attributeName = $item->attributes();
+					echo $attributeName;
+					}  	
+  	  					 				
 		
 			}
 		}
