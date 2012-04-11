@@ -104,18 +104,18 @@
     			'id' => $uid,
    		 	);
    		 	
-   		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?". http_build_query($sumParams,'','&'); 
-		echo $url;
+   		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?". http_build_query($sumParams,'','&')."<BR>"; 
 			$xml = simplexml_load_file($url);
-  	  		foreach( $xml->children() as $docsum){	
- //parse XML	foreach($docsum->children() as $item){	
-					$attributeName = $item->attributes();
-					echo $attributeName;
-					}  	
-  	  					 				
-		
-			}
-		}
+  	  		$result = $xml->xpath('/PubmedArticleSet/PubmedArticle/MedlineCitation');
+				//pull whatever you want from the XML, these two are not available from eSummary
+  	  		 	$paperInfo=array(
+				'address'=> $result[0]->Article->Affiliation,
+				'abstract'=> $result[0]->Article->Abstract->AbstractText,
+			
+				);
+			return $paperInfo;
+  	  		
+		}	
 	
 		function npi(){
 		
@@ -127,7 +127,8 @@
 	$array=array("Waxman SG [AUTHOR]","MULTIPLE SCLEROSIS [MESH FIELDS]");
 	$test=new dataMiner();
 	
-	$arrayTest=$test->eFetch("4314823");
+	$arrayTest=$test->eFetch("22190573");
+	echo $arrayTest['address'];
 /*	foreach($arrayTest as $info){
 		
 		if(is_array($info)==1){
