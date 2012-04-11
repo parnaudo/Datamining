@@ -124,11 +124,6 @@
 	
 	}
 	
-	$array=array("Waxman SG [AUTHOR]","MULTIPLE SCLEROSIS [MESH FIELDS]");
-	$test=new dataMiner();
-	
-	$arrayTest=$test->eFetch("22190573");
-	echo $arrayTest['address'];
 /*	foreach($arrayTest as $info){
 		
 		if(is_array($info)==1){
@@ -227,6 +222,7 @@ class mysql {
 			else $what_to_set []= "`$field`='".mysql_real_escape_string($value,$this->con)."'";
 		}
 		$what_to_set_string = implode(',',$what_to_set);
+		echo $what_to_set_string;
 		return $this->execute("UPDATE $table SET $what_to_set_string WHERE $conditions");
 	}
 	function insert($table=null,$array_of_values=array()) {
@@ -246,4 +242,5 @@ class mysql {
 		return $this->execute("DELETE FROM $table WHERE $conditions");
 	}
 }
+
 ?>
