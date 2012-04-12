@@ -1,34 +1,33 @@
-<?php
-
-/*
-This script accepts as an input a list of authors names and queries the pubmed database for all the papers attributed to the author. It then parses all the authors listed on the paper, marks the first, second and last author and records them to a sepaarate table. 
-
-Written by Paul Arnaudo 3/10/12 
-*/
+<?php 
 include("../lib/init.php");	
-
-$Start = getTime(); 
-$dataMiner = new dataMiner;
-$papers=$mysql->query("SELECT id FROM papers");
-foreach($papers as $key){
+$dataCounts=array();
+$dataBetweenness=array();
+$dataCloseness=array();
+$result = $mysql->query("select distinct name,topneurologistsnetworkmeasures.Id,count(paper) as paperCount,BetweennessCentrality,ClosenessCentrality from topneurologistsnetworkmeasures 
+INNER JOIN coauthorinstance ON topneurologistsnetworkmeasures.Id=coauthorinstance.coauthor where topneurologistsnetworkmeasures.Id=1
+group by topneurologistsnetworkmeasures.id
+order by count(paper) desc");
+foreach($result as $key){
 	foreach($key as $row){
-		$efetch = $dataMiner->eFetch($row['id']);
-		if($efetch['address']==''){
-			echo "NO ADDRESS<BR>";
-		}
-		else{
-			$data = array(
-						'address'=>$efetch['address']
+		print "UPDATE topneurologistsnetworkmeasures SET `paperCount`='".$row['paperCount']."' WHERE Id='".$row['Id']."'";
+		$test=$mysql->query("UPDATE topneurologistsnetworkmeasures SET `paperCount`='".$row['paperCount']."' WHERE Id='".$row['Id']."'");
+		/*	$data = array(
+						'paperCount'=>$row['paperCount']
 			);
-		 	$test=$mysql->update('papers',$data,'id='.$row['id']);
-		 	var_dump($test);
-			
-		}
-	
+		 	$test=$mysql->update('topneurologistsnetworkmeasures',$data,'Id='.$row['Id']);
+		*/
+		
 	}
-
-
 }
-$End = getTime(); 
-echo "Time taken = ".number_format(($End - $Start),2)." secs";
-?>
+/*
+function getPercentiles($data){	
+	$percentileArray=array();
+	$percentiles=array(10,20,30,40,50,60,70,80,90);
+	foreach($percentiles as $key){
+		$percentile=percentile($data,$key);
+		$percentileArray[$key]=$percentile;
+	}
+	return $percentileArray;
+}
+*/
+?> 

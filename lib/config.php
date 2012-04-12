@@ -3,7 +3,7 @@
 $connection = array(
 	'host' => 'localhost',
 	'user' => 'root',
-	'pass' => 'root',
+	'pass' => '',
 	'db' => 'zephyr'
 );
 
