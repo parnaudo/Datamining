@@ -9,6 +9,8 @@ group by topneurologistsnetworkmeasures.id
 order by count(paper) desc");
 foreach($result as $key){
 	foreach($key as $row){
+		$paperCount=$row['paperCount'];
+		$id=$row['Id'];
 		print "UPDATE topneurologistsnetworkmeasures SET `paperCount`='".$row['paperCount']."' WHERE Id='".$row['Id']."'";
 		$test=$mysql->query("UPDATE topneurologistsnetworkmeasures SET `paperCount`='".$row['paperCount']."' WHERE Id='".$row['Id']."'");
 		/*	$data = array(
