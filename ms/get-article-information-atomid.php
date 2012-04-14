@@ -3,33 +3,17 @@ include("../lib/init.php");
 $dataCounts=array();
 $dataBetweenness=array();
 $dataCloseness=array();
-$result = $mysql->query("select distinct name,topneurologistsnetworkmeasures.Id,count(paper) as paperCount,BetweennessCentrality,ClosenessCentrality from topneurologistsnetworkmeasures 
-INNER JOIN coauthorinstance ON topneurologistsnetworkmeasures.Id=coauthorinstance.coauthor where topneurologistsnetworkmeasures.Id=1
-group by topneurologistsnetworkmeasures.id
-order by count(paper) desc");
-foreach($result as $key){
-	foreach($key as $row){
-		$paperCount=$row['paperCount'];
-		$id=$row['Id'];
-		print "UPDATE topneurologistsnetworkmeasures SET `paperCount`='".$row['paperCount']."' WHERE Id='".$row['Id']."'";
-		$test=$mysql->query("UPDATE topneurologistsnetworkmeasures SET `paperCount`='".$row['paperCount']."' WHERE Id='".$row['Id']."'");
-		/*	$data = array(
-						'paperCount'=>$row['paperCount']
-			);
-		 	$test=$mysql->update('topneurologistsnetworkmeasures',$data,'Id='.$row['Id']);
-		*/
+//$query="select percentile, count,a.id,n.firstName,n.middleName,n.lastName, OfficialFullName from trial INNER JOIN neurologist as n ON (trial.firstName=n.FirstName AND n.lastName=trial.LastName ) INNER JOIN authors as a on a.atomId=n.id order by count desc";
+$query="select firstName, middleName,lastName, authors.id from neurologist INNER JOIN authors on authors.atomId=neurologist.id";
+$result = mysql_query($query);
+
+while($row=mysql_fetch_array($result)){
+		  	//	$updateQuery="UPDATE topneurologistsnetworkmeasures SET firstName='".$row['firstName']."',middleName='".$row['middleName']."',lastName='".$row['lastName']."', ClinicalTrialsCount='".$row['count']."', ClinicalTrialspercentile='".$row['percentile']."' WHERE id=".$row['id'];
+		  		$updateQuery="UPDATE topneurologistsnetworkmeasures SET firstName='".$row['firstName']."',middleName='".$row['middleName']."',lastName='".$row['lastName']."' WHERE id=".$row['id'];
+		  		echo $updateQuery."<BR>";
+				mysql_query($updateQuery);
+
 		
-	}
 }
-/*
-function getPercentiles($data){	
-	$percentileArray=array();
-	$percentiles=array(10,20,30,40,50,60,70,80,90);
-	foreach($percentiles as $key){
-		$percentile=percentile($data,$key);
-		$percentileArray[$key]=$percentile;
-	}
-	return $percentileArray;
-}
-*/
+
 ?> 

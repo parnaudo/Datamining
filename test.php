@@ -7,34 +7,53 @@ Written by Paul Arnaudo 3/29/12
 */
 include("lib/init.php");	
 
-$percentiles=array(
-				90=>13,
-				80=>7,
-				70=>4,
-				60=>3,
-				50=>2,
-			);
+$mysql = new mysql($connection);
 
-quintile(3,$percentiles);
-function quintile($value, $array){
+$physicians = "select distinct paper, coAuthorPosition,numAuthors,topneurologistsnetworkmeasures.id, SJR from coauthorinstance INNER JOIN papers on papers.id=paper  INNER JOIN topneurologistsnetworkmeasures on coauthorinstance.coAuthor=topneurologistsnetworkmeasures.id 
+LEFT JOIN journal ON (journal.ISSN=papers.ISSN OR journal.Title=papers.journal)";
+$result=mysql_query($physicians);
+while($row=mysql_fetch_array($result)){
+	$updateQuery='';
+	$journalRank=.1;
+	switch ($row['coAuthorPosition']) {
+    	case 1:
+   //     echo "coauthor 1";
+			$position=10;
+        	break;
+   		 case 2:
+  //      echo "coauthor 2";
+			$position=8;
+       		 break;
+    	 case 500:
+			$position=6;
+   //     echo "coauthor 500";
+       		 break;
+   		 default:
+			$position=4;
+    //  	echo "coauthor X";
+	}
 	
-
-	if($value >= $array['90']){
-		echo "90";
-	}
-	elseif($value <=$array['90'] && $value >=$array['80']){
-		echo "80";
-	}
-	elseif($value <=$array['80'] && $value >=$array['70']){
-		echo 70;
-	}	
-	elseif($value <=$array['70'] && $value >=$array['60']){
-		echo 60;
-	}
+	//echo $row['paper']."  ".$row['coAuthorPosition']."  ".$row['numAuthors']."  ".$row['SJR']."  ".$position;
+	$numAuthorModifier= round(1/($row['numAuthors']-1),2);
+	if(empty($row['SJR'])){
+		$journalRank=.1;
+		}
 	else{
-		echo "NEITHER";	
-	}
-
-
+		$journalRank=$row['SJR'];
+		}
+		$score=$position*$journalRank*$numAuthorModifier;
+		$updateQuery="UPDATE topneurologistsnetworkmeasures SET SCImagoProminenceScore=(SCImagoProminenceScore+".$score.") WHERE Id=".$row['id'];
+		mysql_query($updateQuery);
+		echo $updateQuery;
 }
+
+
+/*
+foreach($physicians as $key){
+	foreach($key as $row){
+		echo $row['paper']."  ".$row['coAuthorPosition']."  ".$row['numAuthors']."  ".$row['id']."<BR>";
+	
+	}
+}
+*/
 ?>
