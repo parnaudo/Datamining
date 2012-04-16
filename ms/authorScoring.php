@@ -45,7 +45,7 @@ while($row=mysql_fetch_array($result)){
 		$numAuthorModifier= round(1/($numAuthors-1),2);
 		$coordinates = scoringTransform($rowInstance['coAuthorPosition'],$authorPosition);
 		$score=$scoringArray[$coordinates[0]][$coordinates[1]];
-		echo "AUTHOR POS: ".$authorPosition." COAUTHOR POS: ".$rowInstance['coAuthorPosition']."SCORE.".$score. " NUM AUTHOR MOD: ".$numAuthorModifier. " PAPER ID: ".$paper."<BR>";
+		//echo "AUTHOR POS: ".$authorPosition." COAUTHOR POS: ".$rowInstance['coAuthorPosition']."SCORE.".$score. " NUM AUTHOR MOD: ".$numAuthorModifier. " PAPER ID: ".$paper."<BR>";
 		$score=($score*$numAuthorModifier);
 		$relationTest= "SELECT id FROM relationship WHERE coAuthor=".$rowInstance['coAuthor']." AND authorAtom=".$author;
 		$resultRelation=mysql_query($relationTest);
@@ -60,7 +60,7 @@ while($row=mysql_fetch_array($result)){
 			}	
 	    else {
 			$insertRelationQuery="INSERT INTO relationship (coAuthor, authorAtom, relationship, paperCount,targetDoc) VALUES ('".$rowInstance['coAuthor']."','".$author."','".$score."','1','".$targetDocFlag."')";
-			//echo $insertRelationQuery."<BR>";
+			echo $insertRelationQuery."<BR>";
 			mysql_query($insertRelationQuery);			
 			}
 	}

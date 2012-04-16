@@ -59,6 +59,9 @@
 					if(strpos($attributeName,"FullJournalName")===0){
 						$journal = $item[0];	
 					}
+					if(strpos($attributeName,"ESSN")===0){
+						$ISSN = str_replace('-',"",$item[0]);	
+					}
 					if(strpos($attributeName,"Title")===0){
 						$title= $item[0];	
 					}
@@ -91,6 +94,7 @@
 				'pubDate'=> $pubdate,
 				'lastAuthor'=> $lastAuthor,
 				'coAuthors'=> $authors,
+				'ISSN'=>$ISSN,
 			
 			);
 			return $paperInfo;
