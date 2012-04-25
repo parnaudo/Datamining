@@ -5,13 +5,14 @@
 	
 //Input is an array of terms for search, including pubmed keywords ex: array("Kurtzke JF [AUTHOR]","MULTIPLE SCLEROSIS [MESH FIELDS]"), $count is 1 if a count is desired, otherwise array of UIDs will be returned
 		function eSearch($input,$countFlag){
+			
 			$query='';
 			$query=implode(" AND ", $input);
 			print "<br>Searching for: $query\n";
  		 	$params = array(
     			'db' => 'pubmed',
    				'retmode' => 'xml',
-    			'retmax' => 200,
+    			'retmax' => 1,
     			'usehistory' => 'y',
 				'tool' => 'SCUcitationminer',
 				'email' => 'parnaudo@scu.edu',
@@ -28,13 +29,18 @@
 			}
 //otherwise return set of UIDs that were returned from the query
 			else{
+				
 				$papers=array();
 				foreach($xml->IdList->Id as $uid){
 				 	$papers[]=$uid;
 				 }
-				return $papers;
-	
+				 $paperInfo = array(
+				 			'papers'=>$papers,
+				 			'count'=>$count,
+				 			);
+				return $paperInfo;		
 			}
+			
 		}
 		
 //accepts a UID and returns a multi-dimensional array with all the desired paper fields along with all coauthors. More fields can be added from pubmed if required.			
@@ -108,39 +114,76 @@
     			'id' => $uid,
    		 	);
    		 	
-   		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?". http_build_query($sumParams,'','&')."<BR>"; 
+   		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?". http_build_query($sumParams,'','&'); 
+   		 	 $url=str_replace('%5B0%5D','',$url);
+   		 	 
 			$xml = simplexml_load_file($url);
   	  		$result = $xml->xpath('/PubmedArticleSet/PubmedArticle/MedlineCitation');
 				//pull whatever you want from the XML, these two are not available from eSummary
+  	  		 	$date=$result[0]->Article->Journal->JournalIssue->PubDate->Day." ".$result[0]->Article->Journal->JournalIssue->PubDate->Month." ".$result[0]->Article->Journal->JournalIssue->PubDate->Year;
+				$authorCount= $result[0]->Article->AuthorList->Author->count();
+				$authors=$result[0]->Article->AuthorList->Author;
+				$lastAuthor=$authors[$authorCount]->LastName." ".$authors[$authorCount]->Initials;
   	  		 	$paperInfo=array(
-				'address'=> $result[0]->Article->Affiliation,
-				'abstract'=> $result[0]->Article->Abstract->AbstractText,
+					'affiliation'=> $result[0]->Article->Affiliation,
+					//'abstract'=> $result[0]->Article->Abstract->AbstractText,
+					'ISSN'=>str_replace('-',"",$result[0]->Article->Journal->ISSN),
+					'journal'=>$result[0]->Article->Journal->Title,
+					'pubDate'=>$date,
+					'title'=>$result[0]->Article->ArticleTitle,
+					'authors'=>$result[0]->Article->AuthorList,
+					'lastAuthor'=>$lastAuthor,
+					'pubType'=>$result[0]->Article->PublicationTypeList,
+					'authorCount'=>$authorCount,
+				
 			
 				);
 			return $paperInfo;
   	  		
 		}	
 	
-		function npi(){
-		
-		
-		}
+		/*	function npi(){
+				$specialty='';
+						
+				$specialtyArray=array();
+	 			$query = "Neurology"; //your query terms
+ 	 			print "Searching for: $query\n";
+  				$params = array(
+							'first_name' => '',
+    						'last_name' => '',
+    						'zip' => '',
+							'org_name' => '',
+    						'state' => '',
+							'city_name' => '',
+							'taxonomy' => 'code_179',
+    						'is_person' => 'true',
+							'is_address' => 'false',
+							'format' => 'json',
+    							);
+  //NPI API URL
+  				$url = 'http://docnpi.com/api/index.php?' . http_build_query($params);
+				$homepage = file_get_contents($url);
+				$json = json_decode($homepage);
+				$jsonArray = (array) $json;
+ //parse JSON
+ 				$count=0;
+				foreach($jsonArray as $value){
+					
+					$fname=$value->first_name;
+					$lname=$value->last_name;
+					$address=$value->address;
+					$city=$value->city;
+					$state=$value->state;
+					$zip=$value->zip;
+					$id=$value->npi;
+					foreach($value->tax_array as $specialty){
+							$specialtyArray[]=$specialty;
+					}
+
+				}
+			} */	
 	
 	}
-	
-/*	foreach($arrayTest as $info){
-		
-		if(is_array($info)==1){
-		  	foreach($info as $authors){
-		  		echo $authors['name']. " ".$authors['position']."<BR>";
-		  	}
-		}
-		else{
-		echo $info;
-		}
-	
-	}
-*/
 
 class mysql {
 	var $con;

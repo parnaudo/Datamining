@@ -188,7 +188,7 @@ while($row=mysql_fetch_array($result)){
 function authorPubmedTransform($first,$middle,$last){
 	 $middle=substr($middle,0,1);
  	 $first=substr($first,0,1);	
- 	 $query = ''.ucfirst(strtolower($last))." ".$first.$middle;
+ 	 $query = ''.ucfirst(strtolower($last))." ".$first.$middle. "[Author]";
  	 return $query;
 }
 function percentile($data,$percentile){ 
