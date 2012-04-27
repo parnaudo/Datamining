@@ -37,7 +37,7 @@ $query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName
 	'tool' => 'SCUcitationminer',
 	'email' => 'parnaudo@scu.edu',
 
-    'term' => $query.  " AND MULTIPLE SCLEROSIS [MESH FIELDS]",
+    'term' => $query.  " AND (MULTIPLE SCLEROSIS [MESH FIELDS] OR MULTIPLE SCLEROSIS [Title] OR MULTIPLE SCLEROSIS [Journal])",
 //also can add MeSH terms here for more granularity
     );
   
@@ -136,8 +136,6 @@ $query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName
 							$updateQuery="UPDATE coAuthorInstance SET query='".$query."' WHERE paper=".$uid." AND coAuthor='".$author."'"; 
 							mysql_query($updateAuthorQuery);
 					  		mysql_query($updateQuery);
-					  		$cleanUpQuery="UPDATE coAuthorInstance SET coAuthor='".$authorIdentifier."' WHERE coAuthor='".$author."'";
-					  		mysql_query($cleanUpQuery);
 	 					 }
 					elseif($paperFlag > 0){
 							//instance already created, no need 	

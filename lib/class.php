@@ -116,7 +116,6 @@
    		 	
    		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?". http_build_query($sumParams,'','&'); 
    		 	 $url=str_replace('%5B0%5D','',$url);
-   		 	 
 			$xml = simplexml_load_file($url);
   	  		$result = $xml->xpath('/PubmedArticleSet/PubmedArticle/MedlineCitation');
 				//pull whatever you want from the XML, these two are not available from eSummary

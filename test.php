@@ -18,13 +18,14 @@ clearAuthorTables();
 $authorID=1;
 $filter="(MULTIPLE SCLEROSIS [MESH FIELDS] OR MULTIPLE SCLEROSIS [Title] OR MULTIPLE SCLEROSIS [Journal])";
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
-//$queryDoctors = "select * from neurologist where id IN (1699766238)";
-$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
+$queryDoctors = "select * from neurologist where id IN (1760442420)";
+//$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   	$query=array();
 	$count=0;
 	$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']); //your query term, searches for both middle name and middle initials	
+	echo $author."<BR>";
 	$query[]=$author;
 	$query[]=$filter;
 	$uids=$dataminer->eSearch($query,0);
@@ -69,28 +70,34 @@ while($row=mysql_fetch_array($result)){
 						  //echo $author." already in authors<br>";
 				  }
 				  else{
-					  $insertAuthor="INSERT INTO authors(id,name, atomId,lastName,foreName) VALUES ('".$authorID."','".$pubmedName."','".$atomId."','".$lastName."','".$foreName."')";
-					//  echo $insertAuthor."<BR>";
-					  mysql_query($insertAuthor);
+					  $insertAuthor="INSERT INTO authors(id,name, atomId,lastName,foreName) VALUES ('".$authorID."','".mysql_escape_string($pubmedName)."','".$atomId."','".mysql_escape_string($lastName)."','".mysql_escape_string($foreName)."')";
+					  echo $insertAuthor."<BR>";
+					  mysql_query($insertAuthor)  or die ("Error in query: $query. ".mysql_error());
 					  $authorID++;
 				  }
 				  if($paperFlag < 1 && $authorMatch==1){	
-					$paperQuery="INSERT INTO papers (id, title, journal, numAuthors, pubDate,ISSN,affiliation) VALUES ('".$paperID."','".mysql_escape_string($paperInfo['title'])."','".$paperInfo['journal']."','".$paperInfo['authorCount']."','".$paperInfo['pubDate']."','".$paperInfo['ISSN']."','".mysql_escape_string($paperInfo['affiliation'])."')";
-					mysql_query($paperQuery);
+					$paperQuery="INSERT INTO papers (id, title, journal, numAuthors, pubDate,ISSN,affiliation) VALUES ('".$paperID."','".mysql_escape_string($paperInfo['title'])."','".mysql_escape_string($paperInfo['journal'])."','".$paperInfo['authorCount']."','".$paperInfo['pubDate']."','".$paperInfo['ISSN']."','".mysql_escape_string($paperInfo['affiliation'])."')";
+					echo $paperQuery."<BR>";
+					mysql_query($paperQuery)  or die ("Error in query: $query. ".mysql_error());
 				  	$insertCoAuthorInstance = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$coAuthor."','".$paperID."','".$countAuthors."','".$row['id']."','".$physicianQuery."')";
-				  	mysql_query($insertCoAuthorInstance);		
+				  	echo $insertCoAuthorInstance."<BR>";
+				  	mysql_query($insertCoAuthorInstance)  or die ("Error in query: $query. ".mysql_error());		
+				  	
 				  }
 				  elseif($paperFlag < 1){
 
 				  	$insertCoAuthorInstance = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$coAuthor."','".$paperID."','".$countAuthors."','".$row['id']."','".$physicianQuery."')";
-				  	mysql_query($insertCoAuthorInstance);					
+				  	echo $insertCoAuthorInstance;
+				  	echo "LAST";
+				  	mysql_query($insertCoAuthorInstance)  or die ("Error in query: $query. ".mysql_error());					
 				  }
 				  else{
 					  if($authorMatch==1){
 						$updateAuthorQuery="UPDATE authors set  atomId='".$atomId."' WHERE id='".$coAuthor."'";
-						mysql_query($updateAuthorQuery);  
+						mysql_query($updateAuthorQuery)  or die ("Error in query: $query. ".mysql_error());  
 						$updateQuery="UPDATE coAuthorInstance SET query='".$author."' WHERE paper=".$paperID." AND coAuthor='".$coAuthor."'"; 
-						mysql_query($updateQuery);  
+						mysql_query($updateQuery)  or die ("Error in query: $query. ".mysql_error());  
+					  	
 					  }
 				  }
 
