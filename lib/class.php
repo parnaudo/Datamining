@@ -117,12 +117,21 @@
    		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?". http_build_query($sumParams,'','&'); 
    		 	 $url=str_replace('%5B0%5D','',$url);
 			$xml = simplexml_load_file($url);
+			$bookTest= $xml->xpath('/PubmedArticleSet/PubmedBookArticle/BookDocument');
+			$bookTitle=$bookTest[0]->Book->BookTitle;
+			if($bookTitle!=''){
+				echo $bookTitle;
+				return;
+			}
+			else{
   	  		$result = $xml->xpath('/PubmedArticleSet/PubmedArticle/MedlineCitation');
 				//pull whatever you want from the XML, these two are not available from eSummary
   	  		 	$date=$result[0]->Article->Journal->JournalIssue->PubDate->Day." ".$result[0]->Article->Journal->JournalIssue->PubDate->Month." ".$result[0]->Article->Journal->JournalIssue->PubDate->Year;
+
 				$authorCount= $result[0]->Article->AuthorList->Author->count();
 				$authors=$result[0]->Article->AuthorList->Author;
 				$lastAuthor=$authors[$authorCount]->LastName." ".$authors[$authorCount]->Initials;
+				
   	  		 	$paperInfo=array(
 					'affiliation'=> $result[0]->Article->Affiliation,
 					//'abstract'=> $result[0]->Article->Abstract->AbstractText,
@@ -134,9 +143,9 @@
 					'lastAuthor'=>$lastAuthor,
 					'pubType'=>$result[0]->Article->PublicationTypeList,
 					'authorCount'=>$authorCount,
-				
-			
-				);
+			);
+		}
+						
 			return $paperInfo;
   	  		
 		}	
