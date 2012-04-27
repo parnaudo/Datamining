@@ -34,7 +34,6 @@ while($row=mysql_fetch_array($result)){
 	foreach($uids['papers'] as $key=>$paperID){
 		$paperFlag=0;
 		$paperQuery="SELECT id FROM papers where id=".$paperID;
-		
 		$resultPaper=mysql_query($paperQuery);
 		$paperFlag = mysql_num_rows($resultPaper);	
 
@@ -57,6 +56,7 @@ while($row=mysql_fetch_array($result)){
 					 $authorMatch=1;
 				  }				  
 				  $testQuery= "SELECT id,atomId FROM authors WHERE name LIKE '%".$pubmedName."%'";
+				  echo $testQuery;
 				  $resultAuthor=mysql_query($testQuery);
 				  $rows = mysql_num_rows($resultAuthor);
 				  //checks to see if author has already been inputted
@@ -88,12 +88,12 @@ while($row=mysql_fetch_array($result)){
 
 				  	$insertCoAuthorInstance = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$coAuthor."','".$paperID."','".$countAuthors."','".$row['id']."','".$physicianQuery."')";
 				  	echo $insertCoAuthorInstance;
-				  	echo "LAST";
 				  	mysql_query($insertCoAuthorInstance)  or die ("Error in query: $query. ".mysql_error());					
 				  }
 				  else{
 					  if($authorMatch==1){
 						$updateAuthorQuery="UPDATE authors set  atomId='".$atomId."' WHERE id='".$coAuthor."'";
+						echo $updateAuthorQuery;
 						mysql_query($updateAuthorQuery)  or die ("Error in query: $query. ".mysql_error());  
 						$updateQuery="UPDATE coAuthorInstance SET query='".$author."' WHERE paper=".$paperID." AND coAuthor='".$coAuthor."'"; 
 						mysql_query($updateQuery)  or die ("Error in query: $query. ".mysql_error());  
@@ -104,13 +104,14 @@ while($row=mysql_fetch_array($result)){
 			  }
 		  }
 		
-
+		
 		//print_r($paperInfo);
 		//echo $paperIDs." WITH KEY: ".$key."<BR>";
 	
 	}
 
 }
+
 updateAuthorPosition();
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs";

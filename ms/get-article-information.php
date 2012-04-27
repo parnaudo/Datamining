@@ -93,7 +93,6 @@ $query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName
 					$authorIdentifier='';
 					//identifies author from my data set
 					if(stripos($author,$row['lastName'])===0){
-						$authorIdentifier=$row['id'];
 						$authorMatch=1;
 						$physicianQuery=$query;
 						
@@ -112,15 +111,10 @@ $query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName
 						//echo $author." already in authors<br>";
 					}
 					else {
-						if($authorMatch > 0){
-						$insertAuthorQuery="INSERT INTO authors(id,name, atomId) VALUES ('".$authorIdentifier."','".$author."','".$authorIdentifier."')";
-						$author=$authorID;						
-						echo $insertAuthorQuery;
-						}
-						else{
+
 						$insertAuthorQuery="INSERT INTO authors(id,name, atomId) VALUES ('".$authorID."','".$author."','".$authorIdentifier."')";
 						$author=$authorID;
-						}
+
 						$authorID++;
 						mysql_query($insertAuthorQuery);
 						
@@ -131,7 +125,7 @@ $query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName
 					 $paperFlag = mysql_num_rows($resultPaper);
 	 				if($paperFlag > 0 && $authorMatch > 0){
 							$paperUpdateQuery="  ";
-							$updateAuthorQuery="UPDATE authors set id='".$authorIdentifier."', atomId='".$authorIdentifier."' WHERE id='".$author."'";
+							$updateAuthorQuery="UPDATE authors set atomId='".$authorIdentifier."' WHERE id='".$author."'";
 							echo $updateAuthorQuery."<BR>";
 							$updateQuery="UPDATE coAuthorInstance SET query='".$query."' WHERE paper=".$uid." AND coAuthor='".$author."'"; 
 							mysql_query($updateAuthorQuery);

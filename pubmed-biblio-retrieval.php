@@ -16,16 +16,15 @@ $authorID=1;
 
 
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
-$queryDoctors = "SELECT atomId, firstName,middleName, lastName from tempdoc where atomId=365390";
+$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
 
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   $query='';
+  $first=substr($row['firstName'],0,1);
   $middle=substr($row['middleName'],0,1);
  
- $query = "(".$row['firstName']." ".$row['middleName']." ".$row['lastName']. "[Full Author Name] OR ".$row['firstName']." ".$middle." ".$row['lastName']."[FULL AUTHOR NAME])"; //your query term, searches for both middle name and middle initial
-
-  print "<br>Searching for: $query\n";
+$query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']); //your query term, searches for both middle name and middle initial
   $params = array(
     'db' => 'pubmed',
     'retmode' => 'xml',
@@ -34,7 +33,7 @@ while($row=mysql_fetch_array($result)){
 	'tool' => 'SCUcitationminer',
 	'email' => 'parnaudo@scu.edu',
 
-    'term' => $query.  " AND cardio",
+    'term' => $query.  " AND (MULTIPLE SCLEROSIS [MESH FIELDS] OR MULTIPLE SCLEROSIS [Title] OR MULTIPLE SCLEROSIS [Journal])",
 //also can add MeSH terms here for more granularity
     );
   
@@ -59,7 +58,6 @@ while($row=mysql_fetch_array($result)){
     	'id' => $uid,
    		 );
 	  $bibliourl= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?". http_build_query($sumParams,'','&'); 
-  	  echo $bibliourl;
 	  $bibliourl=str_replace('%5B0%5D','',$bibliourl);
 	  $biblioxml = simplexml_load_file($bibliourl);
   	  foreach( $biblioxml->children() as $docsum){
@@ -89,11 +87,12 @@ while($row=mysql_fetch_array($result)){
 					$physicianQuery='';
 					$authorIdentifier='';
 					//identifies author from my data set
-					if(stripos($author,$row['lastName'])===0){
-						$authorIdentifier=$row['atomId'];
+					if(stripos($author,$row['lastName']." ".$first.$middle)===0){
+						$authorIdentifier=$row['id'];
 						$authorMatch=1;
 						$physicianQuery=$query;
-					}	
+					}
+					echo $authorMatch.$row['atomId']."<BR>";	
 					if($countAuthors===$lastAuthor){
 						$countAuthors='500';
 					}
@@ -119,7 +118,7 @@ while($row=mysql_fetch_array($result)){
 					 $resultPaper=mysql_query($paperQuery);
 					 $paperFlag = mysql_num_rows($resultPaper);
 	 				if($paperFlag > 0 && $authorMatch > 0){
-							$paperUpdateQuery="  ";
+							$paperUpdateQuery="";
 							$updateAuthorQuery="UPDATE authors set atomId='".$authorIdentifier."' WHERE id='".$author."'";
 							//echo $updateAuthorQuery."<BR>";
 							$updateQuery="UPDATE coAuthorInstance SET query='".$query."' WHERE paper=".$uid." AND coAuthor='".$author."'"; 
@@ -146,8 +145,7 @@ while($row=mysql_fetch_array($result)){
 		}
 		//insert into paper 
 		
-		$insertJournalQuery = "INSERT INTO papers (id, title, journal, numAuthors, pubDate) VALUES ('".$uid."','".$title."','".$journal."','".$lastAuthor."','".$pubdate."')";
-		echo $insertJournalQuery."<BR>";
+		$insertJournalQuery = "INSERT INTO papers (id, title, journal, numAuthors, pubDate) VALUES ('".$uid."','".$title."','".$journal."','".$lastAuthor."','".$pubdate."')"; 
   		mysql_query($insertJournalQuery);
 	  
 	}
