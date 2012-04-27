@@ -2,11 +2,8 @@
 
 
 include("lib/init.php");
-//updatePercentiles("topneurologistsnetworkmeasures","paperCount","PaperCountPercentile");
-//updatePercentiles("topneurologistsnetworkmeasures","ClosenessCentrality","ClosenessPercentile");
-//updatePercentiles("topneurologistsnetworkmeasures","BetweennessCentrality","BetweennessPercentile");
-//updatePercentiles("topneurologistsnetworkmeasures","SCImagoProminenceScore","SCImagoProminenceScorePercentile");
-//updatePercentiles("topneurologistsnetworkmeasures","ClinicalTrialsCount","ClinicalTrialsPercentile");	
+$Start = getTime(); 
+
 $dataminer=new dataMiner;
 
 /*
@@ -19,13 +16,10 @@ $Start = getTime();
 //remove old data from tables
 clearAuthorTables();
 $authorID=1;
-
-
-
-$filter="MULTIPLE SCLEROSIS [MESH FIELDS]";
+$filter="(MULTIPLE SCLEROSIS [MESH FIELDS] OR MULTIPLE SCLEROSIS [Title] OR MULTIPLE SCLEROSIS [Journal])";
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
-$queryDoctors = "select * from neurologist where id=1467430686";
-//$queryDoctors = "select * from neurologist where id=1003013616";
+//$queryDoctors = "select * from neurologist where id IN (1699766238)";
+$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   	$query=array();
@@ -35,52 +29,82 @@ while($row=mysql_fetch_array($result)){
 	$query[]=$filter;
 	$uids=$dataminer->eSearch($query,0);
 //if there are papers, insert an author record	
-	if($uids['count']!==0){
-		$author=str_ireplace("[AUTHOR]","",$author);
-		$insertAuthor="INSERT INTO authors(id,name, atomId,lastName,foreName) VALUES ('".$authorID."','".$author."','".$row['id']."','".$row['lastName']."','".$row['firstName']." ".$row['middleName']."')";
-		mysql_query($insertAuthor);
-		$authorID++;
-	}
+
 	foreach($uids['papers'] as $key=>$paperID){
-		$paperQuery="SELECT id FROM papers where id=".$uid;
+		$paperFlag=0;
+		$paperQuery="SELECT id FROM papers where id=".$paperID;
+		
 		$resultPaper=mysql_query($paperQuery);
 		$paperFlag = mysql_num_rows($resultPaper);	
-			
-		$paperInfo=$dataminer->eFetch($paperID);
-		$paperQuery="INSERT INTO papers (id, title, journal, numAuthors, pubDate,ISSN,affiliation) VALUES ('".$paperID."','".$paperInfo['title']."','".$paperInfo['journal']."','".$paperInfo['authorCount']."','".$paperInfo['pubDate']."','".$paperInfo['ISSN']."','".$paperInfo['affiliation']."')";
-		
-		mysql_query($paperQuery);
-		foreach($paperInfo['authors'] as $field){
-			foreach($field->children() as $authors){
-				$pubmedName=$authors->LastName." ".$authors->Initials;
-				$lastName=$authors->LastName;
-				$foreName=$authors->ForeName;
-				$testQuery= "SELECT id FROM authors WHERE name LIKE '%".$pubmedName."%'";
-				$resultAuthor=mysql_query($testQuery);
-				$rows = mysql_num_rows($resultAuthor);
-				//checks to see if author has already been inputted
-				if($rows > 0 ){
-						$authorRow=mysql_fetch_array($resultAuthor);
-						$author=$authorRow['id'];
-						//echo $author." already in authors<br>";
-				}
-				else{
-					
-					$insertAuthor="INSERT INTO authors(id,name, atomId,lastName,foreName) VALUES ('".$authorID."','".$pubmedName."','0','".$lastName."','".$foreName."')";
-					mysql_query($insertAuthor);
-					$authorID++;
-				
-				}
-				//LEFT OFF HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				$insertCoAuthorInstance = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$author."','".$uid."','".$countAuthors."','".$targetPhysician."','".$physicianQuery."')";
-				echo $insertCoAuthorInstance;
 
-			}
-		}
+		  $paperInfo=$dataminer->eFetch($paperID);
+		  $countAuthors=0;
+		  foreach($paperInfo['authors'] as $field){
+			 
+			  foreach($field->children() as $authors){
+				  $authorMatch=0;
+				  $countAuthors++;
+				  $atomId=0;
+				  $physicianQuery='';
+				  $coAuthor=$authorID;
+				  $pubmedName=$authors->LastName." ".$authors->Initials;
+				  $lastName=$authors->LastName;
+				  $foreName=$authors->ForeName;
+				  if(stripos($author,$pubmedName)===0){
+				 	 $physicianQuery=$author;	
+					 $atomId=$row['id'];
+					 $authorMatch=1;
+				  }				  
+				  $testQuery= "SELECT id,atomId FROM authors WHERE name LIKE '%".$pubmedName."%'";
+				  $resultAuthor=mysql_query($testQuery);
+				  $rows = mysql_num_rows($resultAuthor);
+				  //checks to see if author has already been inputted
+					if($paperInfo['authorCount']==$countAuthors){
+						$countAuthors=500;
+					}
+				  if($rows > 0 ){
+						  $authorRow=mysql_fetch_array($resultAuthor);
+						  $coAuthor=$authorRow['id'];
+						  $atomId=$row['id'];
+						  //echo $author." already in authors<br>";
+				  }
+				  else{
+					  $insertAuthor="INSERT INTO authors(id,name, atomId,lastName,foreName) VALUES ('".$authorID."','".$pubmedName."','".$atomId."','".$lastName."','".$foreName."')";
+					//  echo $insertAuthor."<BR>";
+					  mysql_query($insertAuthor);
+					  $authorID++;
+				  }
+				  if($paperFlag < 1 && $authorMatch==1){	
+					$paperQuery="INSERT INTO papers (id, title, journal, numAuthors, pubDate,ISSN,affiliation) VALUES ('".$paperID."','".mysql_escape_string($paperInfo['title'])."','".$paperInfo['journal']."','".$paperInfo['authorCount']."','".$paperInfo['pubDate']."','".$paperInfo['ISSN']."','".mysql_escape_string($paperInfo['affiliation'])."')";
+					mysql_query($paperQuery);
+				  	$insertCoAuthorInstance = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$coAuthor."','".$paperID."','".$countAuthors."','".$row['id']."','".$physicianQuery."')";
+				  	mysql_query($insertCoAuthorInstance);		
+				  }
+				  elseif($paperFlag < 1){
+
+				  	$insertCoAuthorInstance = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$coAuthor."','".$paperID."','".$countAuthors."','".$row['id']."','".$physicianQuery."')";
+				  	mysql_query($insertCoAuthorInstance);					
+				  }
+				  else{
+					  if($authorMatch==1){
+						$updateAuthorQuery="UPDATE authors set  atomId='".$atomId."' WHERE id='".$coAuthor."'";
+						mysql_query($updateAuthorQuery);  
+						$updateQuery="UPDATE coAuthorInstance SET query='".$author."' WHERE paper=".$paperID." AND coAuthor='".$coAuthor."'"; 
+						mysql_query($updateQuery);  
+					  }
+				  }
+
+			  }
+		  }
+		
+
 		//print_r($paperInfo);
 		//echo $paperIDs." WITH KEY: ".$key."<BR>";
 	
 	}
 
 }
+updateAuthorPosition();
+$End = getTime(); 
+echo "Time taken = ".number_format(($End - $Start),2)." secs";
 ?>
