@@ -127,8 +127,12 @@
   	  		$result = $xml->xpath('/PubmedArticleSet/PubmedArticle/MedlineCitation');
 				//pull whatever you want from the XML, these two are not available from eSummary
   	  		 	$date=$result[0]->Article->Journal->JournalIssue->PubDate->Day." ".$result[0]->Article->Journal->JournalIssue->PubDate->Month." ".$result[0]->Article->Journal->JournalIssue->PubDate->Year;
-
-				$authorCount= $result[0]->Article->AuthorList->Author->count();
+				if( $result[0]->Article->AuthorList->Author !=NULL){
+					$authorCount= $result[0]->Article->AuthorList->Author->count();
+				}
+				else {
+					$authorCount=0;	
+				}
 				$authors=$result[0]->Article->AuthorList->Author;
 				$lastAuthor=$authors[$authorCount]->LastName." ".$authors[$authorCount]->Initials;
 				

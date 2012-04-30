@@ -8,7 +8,7 @@ include("lib/init.php");
 $Start = getTime(); 
 $count=0;
 //target set
-$queryDoctors = "SELECT atomId, firstName,zipcode, lastName FROM tempdoc WHERE specialty IS NULL";
+$queryDoctors = "SELECT id, firstName, lastName,specialty FROM topneurologistsnetworkmeasures where specialty=''";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
 /*
@@ -21,9 +21,8 @@ while($row=mysql_fetch_array($result)){
   		$params = array(
 		'first_name' => $row['firstName'],
     	'last_name' => $row['lastName'],
-    	'zip' => $row['zipcode'],
 		'org_name' => '',
-    	'state' => 'CA',
+    	'state' => '',
 		'city_name' => '',
 		'taxonomy' => '',
     	'is_person' => 'true',
@@ -32,6 +31,7 @@ while($row=mysql_fetch_array($result)){
     	);
   //NPI API URL
   	$url = 'http://docnpi.com/api/index.php?' . http_build_query($params);
+
 	$homepage = file_get_contents($url);
 	$json = json_decode($homepage);
 	$jsonArray = (array) $json;
@@ -42,10 +42,11 @@ while($row=mysql_fetch_array($result)){
 				$specialtyArray[]=$specialty;
 			}
 	}	
-	$specialty=implode(" | ",$specialtyArray);
-	//if values then input
+	//$specialty=implode(",",$specialtyArray);
+	$specialty=$specialtyArray[0];
 	if(!empty($specialty)){
-		$specialtyQuery = "UPDATE tempdoc SET specialty='".$specialty."' WHERE atomId='".$row['atomId']."'";
+		$specialtyQuery = "UPDATE topneurologistsnetworkmeasures SET specialty='".$specialty."' WHERE id='".$row['id']."'";
+		echo $specialtyQuery;
 		mysql_query($specialtyQuery);
 		$count++;
 	}

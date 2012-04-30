@@ -9,7 +9,7 @@ $Start = getTime();
 $count=0;
 //target set
 $table="neurologist";
-clearTable($table);
+//clearTable($table);
 
 /*
 
