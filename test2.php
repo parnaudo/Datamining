@@ -2,7 +2,7 @@
 include("lib/init.php");
 $Start = getTime(); 
 $dataminer=new dataMiner;
-$queryDoctors = "select * from topneurologistsnetworkmeasures";
+$queryDoctors = "select * from topneurologistsnetworkmeasures where location IS NULL";
 echo $queryDoctors;
 //$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
 $result = mysql_query($queryDoctors) or die(mysql_error());

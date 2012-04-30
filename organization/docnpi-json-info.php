@@ -4,16 +4,17 @@ This script accepts a list of names and zipcodes and attempts to identify their 
 
 Written by Paul Arnaudo 2/24/12 
 */
-include("lib/init.php");	
+include("../lib/init.php");	
 $Start = getTime(); 
 $count=0;
 //target set
-$queryDoctors = "SELECT id, firstName, lastName,specialty FROM ACS";
+$queryDoctors = "SELECT id, firstName, lastName FROM ACS ";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
 /*
 
 		*/
+	 $address='';	
 	 $specialty='';		
 	 $specialtyArray=array();
 	 $query = $row['firstName']." ".$row['lastName']. " ". $row['zipcode']; //your query terms
@@ -21,7 +22,7 @@ while($row=mysql_fetch_array($result)){
   		$params = array(
 		'first_name' => $row['firstName'],
     	'last_name' => $row['lastName'],
-		'zip'=> $row['zipCode']
+		'zip'=> $row['zipCode'],
 		'org_name' => '',
     	'state' => '',
 		'city_name' => '',
@@ -46,9 +47,9 @@ while($row=mysql_fetch_array($result)){
 	//$specialty=implode(",",$specialtyArray);
 	$specialty=$specialtyArray[0];
 	if(!empty($address)){
-		//$specialtyQuery = "UPDATE topneurologistsnetworkmeasures SET specialty='".$specialty."' WHERE id='".$row['id']."'";
-		echo $address;
-		//mysql_query($specialtyQuery);
+		$specialtyQuery = "UPDATE ACS SET address='".$address."' WHERE id='".$row['id']."'";
+		echo $specialtyQuery;
+		mysql_query($specialtyQuery);
 		$count++;
 	}
 }
