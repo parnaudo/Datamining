@@ -5,14 +5,14 @@
 	
 //Input is an array of terms for search, including pubmed keywords ex: array("Kurtzke JF [AUTHOR]","MULTIPLE SCLEROSIS [MESH FIELDS]"), $count is 1 if a count is desired, otherwise array of UIDs will be returned
 		function eSearch($input,$countFlag){
-			
+	
 			$query='';
 			$query=implode(" AND ", $input);
 			print "<br>Searching for: $query\n";
  		 	$params = array(
     			'db' => 'pubmed',
    				'retmode' => 'xml',
-    			'retmax' => 200,
+    			'retmax' => 500,
     			'usehistory' => 'y',
 				'tool' => 'SCUcitationminer',
 				'email' => 'parnaudo@scu.edu',
@@ -20,6 +20,7 @@
 //also can add MeSH terms here for more granularity
     		);
  			$url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' . http_build_query($params);
+			echo $url;
 //Retrieve the pubmed UIDs to then retrieve summaries for
   			$xml = simplexml_load_file($url);
 			$count= (int) $xml->Count;
@@ -116,6 +117,7 @@
    		 	
    		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?". http_build_query($sumParams,'','&'); 
    		 	 $url=str_replace('%5B0%5D','',$url);
+			 echo $url;
 			$xml = simplexml_load_file($url);
 			$bookTest= $xml->xpath('/PubmedArticleSet/PubmedBookArticle/BookDocument');
 			$bookTitle=$bookTest[0]->Book->BookTitle;
