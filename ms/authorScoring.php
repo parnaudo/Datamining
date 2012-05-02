@@ -51,18 +51,21 @@ while($row=mysql_fetch_array($result)){
 		$resultRelation=mysql_query($relationTest);
 		$relationFlag = mysql_num_rows($resultRelation);
 //Look for instances already
-		if($relationFlag > 0 ){
-			$rowRelation=mysql_fetch_array($resultRelation);
-			$relation=$rowRelation['id'];
-			$updateRelationQuery="UPDATE relationship SET relationship= (relationship + ".$score."), paperCount=(paperCount+1) WHERE id=".$rowRelation['id'];
-			//echo $updateRelationQuery."<br>";
-			mysql_query($updateRelationQuery);
-			}	
-	    else {
-			$insertRelationQuery="INSERT INTO relationship (coAuthor, authorAtom, relationship, paperCount,targetDoc) VALUES ('".$rowInstance['coAuthor']."','".$author."','".$score."','1','".$targetDocFlag."')";
-			echo $insertRelationQuery."<BR>";
-			mysql_query($insertRelationQuery);			
-			}
+		if($targetDocFlag > 0){
+//ONly looking for physicians in group	
+			if($relationFlag > 0 ){
+				$rowRelation=mysql_fetch_array($resultRelation);
+				$relation=$rowRelation['id'];
+				$updateRelationQuery="UPDATE relationship SET relationship= (relationship + ".$score."), paperCount=(paperCount+1) WHERE id=".$rowRelation['id'];
+				//echo $updateRelationQuery."<br>";
+				mysql_query($updateRelationQuery);
+				}	
+		    else {
+				$insertRelationQuery="INSERT INTO relationship (coAuthor, authorAtom, relationship, paperCount,targetDoc) VALUES ('".$rowInstance['coAuthor']."','".$author."','".$score."','1','".$targetDocFlag."')";
+				echo $insertRelationQuery."<BR>";
+				mysql_query($insertRelationQuery);			
+				}
+		}
 	}
 
 
