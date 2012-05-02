@@ -12,7 +12,7 @@
  		 	$params = array(
     			'db' => 'pubmed',
    				'retmode' => 'xml',
-    			'retmax' => 500,
+    			'retmax' => 5,
     			'usehistory' => 'y',
 				'tool' => 'SCUcitationminer',
 				'email' => 'parnaudo@scu.edu',

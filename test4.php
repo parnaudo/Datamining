@@ -2,7 +2,7 @@
 include("lib/init.php");
 $Start = getTime(); 
 $dataminer=new dataMiner;
-$queryDoctors = "select * FROM ACS";
+$queryDoctors = "select * FROM ACS where id=14850";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   	$query=array();
