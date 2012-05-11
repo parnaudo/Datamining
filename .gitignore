@@ -1,1 +1,6 @@
-*~
+# IDE
+.idea
+.settings
+
+# Cache files & Cookie files
+/tests/data/
