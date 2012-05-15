@@ -1,18 +1,16 @@
 <?php
 
-
 	Class dataMiner{
 	
 //Input is an array of terms for search, including pubmed keywords ex: array("Kurtzke JF [AUTHOR]","MULTIPLE SCLEROSIS [MESH FIELDS]"), $count is 1 if a count is desired, otherwise array of UIDs will be returned
 		function eSearch($input,$countFlag){
-	
 			$query='';
 			$query=implode(" AND ", $input);
 			print "<br>Searching for: $query\n";
  		 	$params = array(
     			'db' => 'pubmed',
    				'retmode' => 'xml',
-    			'retmax' => 5,
+    			'retmax' => 500,
     			'usehistory' => 'y',
 				'tool' => 'SCUcitationminer',
 				'email' => 'parnaudo@scu.edu',

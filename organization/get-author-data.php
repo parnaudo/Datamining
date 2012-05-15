@@ -16,19 +16,18 @@ $Start = getTime();
 //remove old data from tables
 clearAuthorTables();
 $authorID=1;
-$filter="";
+$filter="(MULTIPLE SCLEROSIS [MESH FIELDS] OR MULTIPLE SCLEROSIS [Title] OR MULTIPLE SCLEROSIS [Journal])";
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
 //$queryDoctors = "select * from neurologist where id IN (1760442420)";
-$queryDoctors = "select * FROM individual where Specialty='Cardiologist'";
+$queryDoctors = "select * from neurologist where paperCount>2 and (middleName!='' OR paperCountFullAuthor > 1)";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   	$query=array();
 	$count=0;
-	$author=authorPubmedTransform($row['First Name'],$row['Middle Name'],$row['Last Name']); //your query term, searches for both middle name and middle initials	
-	$author1=$row['First Name']." ".$row['Middle Name']." ".$row['Last Name']. "[FULL AUTHOR NAME] AND Cardiology";
+	$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']); //your query term, searches for both middle name and middle initials	
+
 //	echo $author."<BR>";
 	$query[]=$author;
-	$query[]=$author1;
 	if(!empty($filter)){
 		$query[]=$filter;
 	}

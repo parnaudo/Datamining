@@ -1,7 +1,7 @@
 <?php
 
 
-include("lib/init.php");
+include("../lib/init.php");
 $Start = getTime(); 
 
 $dataminer=new dataMiner;
@@ -22,15 +22,20 @@ while($row=mysql_fetch_array($result)){
 		$nameArray[$authorRow['id']]=$authorRow['name'];
 
 	}
-	print_r($testArray);
 	$maxIndex = array_search(max($testArray), $testArray);
 	if(hasDuplicates($testArray)==TRUE){
 		echo "DUPLICATES";
+		print_r($nameArray);
+		foreach($testArray as $key=>$value){
+			$updateAuthor="UPDATE authors set duplicateFlag=1 where id=".$key;
+			echo $updateAuthor;
+			mysql_query($updateAuthor);
 		}
+	}
 	else{
 		foreach($nameArray as $key=>$value){
 			if($key!==$maxIndex){
-				$updateInstance="UPDATE coAuthorInstance SET coAuthor=".$maxIndex." where coAuthor=".$key;
+				$updateInstance="UPDATE coAuthorInstance SET coAuthor=".$maxIndex.", query='".$nameArray[$maxIndex]."' where coAuthor=".$key;
 				$deleteAuthor="DELETE FROM authors where id=".$key ;
 				mysql_query($updateInstance);
 				mysql_query($deleteAuthor);

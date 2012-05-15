@@ -2,19 +2,13 @@
 include("lib/init.php");
 $Start = getTime(); 
 $dataminer=new dataMiner;
-$queryDoctors = "select * from relationship";
+$queryDoctors = "select id, phone from `update`";
+//$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
-	$id=$row['authorAtom'];
-	$source=relationshipToEdge($id);
-	$id=$row['coAuthor'];
-	$target=relationshipToEdge($id);
-	if(empty($target)){
-		echo "EMPTY ID IS: ".$id."<BR>";
-	}
-	$insertQuery="INSERT INTO edge (source, target, direction, weight, class) VALUES (".$source.",".$target.",'Directed',".$row['relationship'].",2";
-	echo $insertQuery."<BR>";
+	$updateQuery="UPDATE neurologist set phone='".$row['phone']."' where id=".$row['id'];
+	echo $updateQuery;
+	mysql_query($updateQuery);
 }
-
 	
 ?>

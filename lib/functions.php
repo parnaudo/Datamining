@@ -228,12 +228,18 @@ function scoringTransform($row, $col){
 function updateAuthorPosition(){
 //query to get doctor set, can really be from anywhere
 //query to get doctor set, can really be from anywhere
-$queryDoctors = "SELECT distinct id, paper, coAuthorPosition, query from coAuthorInstance where query!=''";
-$result = mysql_query($queryDoctors) or die(mysql_error());
-while($row=mysql_fetch_array($result)){
-	$updateQuery='UPDATE coAuthorInstance SET authorPosition='.$row['coAuthorPosition'].' WHERE paper='.$row['paper']. " AND id=".$row['id'];
-	mysql_query($updateQuery);
-	}
+	$queryDoctors = "SELECT distinct coAuthorInstance.id, paper, coAuthorPosition, query,name from coAuthorInstance INNER JOIN authors ON authors.id=coAuthorInstance.coAuthor where query!='' OR atomId!=0";
+	$result = mysql_query($queryDoctors) or die(mysql_error());
+	while($row=mysql_fetch_array($result)){
+		$addQuery='';
+		if(empty($row['query'])){
+			$addQuery=", query='".mysql_escape_string($row['name'])."'";
+		
+		}
+		$updateQuery="UPDATE coAuthorInstance SET authorPosition=".$row['coAuthorPosition'].$addQuery." WHERE paper=".$row['paper']. " AND id=".$row['id'];
+		mysql_query($updateQuery);
+		}
+	
 }	
 
 

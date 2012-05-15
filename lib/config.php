@@ -4,7 +4,7 @@ $connection = array(
 	'host' => 'localhost',
 	'user' => 'root',
 	'pass' => 'root',
-	'db' => 'test'
+	'db' => 'organization'
 );
 
 $mysql = new mysql($connection);

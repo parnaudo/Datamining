@@ -24,7 +24,7 @@ $scoringArray=array( array(NULL,1,2,500,'x'),
 					
 
 clearTable($table);
-$getPapers="SELECT DISTINCT `authors`.id,paper,numAuthors,authorPosition FROM coAuthorInstance INNER JOIN authors ON coAuthor=authors.id INNER JOIN papers ON papers.id=coAuthorInstance.paper WHERE atomId!=0";
+$getPapers="SELECT DISTINCT `authors`.id,paper,numAuthors,authorPosition FROM coAuthorInstance INNER JOIN authors ON coAuthor=authors.id INNER JOIN papers ON papers.id=coAuthorInstance.paper WHERE atomId!=0 and duplicateFlag=0";
 $result=mysql_query($getPapers);
 //Get distinct information on authors we are looking to search for
 while($row=mysql_fetch_array($result)){
@@ -32,11 +32,13 @@ while($row=mysql_fetch_array($result)){
 	$paper=$row['paper'];
 	$numAuthors=$row['numAuthors'];
 	$authorPosition=$row['authorPosition'];
-	$getInstances="SELECT coAuthor, coAuthorPosition,query FROM coAuthorInstance where paper='".$paper."' AND coAuthorPosition!='".$authorPosition."' ";
+	$getInstances="SELECT coAuthor, coAuthorPosition,query,duplicateFlag FROM coAuthorInstance inner join authors on coAuthorInstance.coAuthor=authors.id where paper='".$paper."' AND coAuthorPosition!='".$authorPosition."' ";
+	echo $getInstances."<BR>";
 	$instanceResult=mysql_query($getInstances);
 //GET all distinct coauthor information for each author id and paper
 	while($rowInstance=mysql_fetch_array($instanceResult)){
-		if($rowInstance['query']!=''){
+	echo $rowInstance['duplicateFlag'];
+		if($rowInstance['query']!='' && $rowInstance['duplicateFlag']==0){
 			$targetDocFlag=1;	
 		}
 		else{
