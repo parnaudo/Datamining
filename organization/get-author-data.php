@@ -124,6 +124,7 @@ while($row=mysql_fetch_array($result)){
 }
 
 updateAuthorPosition();
+deduplicateAuthors();
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs";
 ?>

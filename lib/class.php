@@ -1,156 +1,230 @@
 <?php
 
-	Class dataMiner{
-	
-//Input is an array of terms for search, including pubmed keywords ex: array("Kurtzke JF [AUTHOR]","MULTIPLE SCLEROSIS [MESH FIELDS]"), $count is 1 if a count is desired, otherwise array of UIDs will be returned
-		function eSearch($input,$countFlag){
-			$query='';
-			$query=implode(" AND ", $input);
-			print "<br>Searching for: $query\n";
- 		 	$params = array(
-    			'db' => 'pubmed',
-   				'retmode' => 'xml',
-    			'retmax' => 500,
-    			'usehistory' => 'y',
-				'tool' => 'SCUcitationminer',
-				'email' => 'parnaudo@scu.edu',
-    			'term' => $query,
-//also can add MeSH terms here for more granularity
-    		);
- 			$url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' . http_build_query($params);
-			echo $url;
-//Retrieve the pubmed UIDs to then retrieve summaries for
-  			$xml = simplexml_load_file($url);
-			$count= (int) $xml->Count;
-//if set, just return count			
-			if($countFlag==1){
-				return $count;	
-			}
-//otherwise return set of UIDs that were returned from the query
-			else{
+	Class textManipulate{
+//basically this is strpos for more than one occurence	
+		function findOccurences($string, $find) {
+			if (strpos(strtolower($string), strtolower($find)) !== FALSE) {
+				$pos = -1;
+				for ($i=0; $i<substr_count(strtolower($string), strtolower($find)); $i++) {
+					$pos = strpos(strtolower($string), strtolower($find), $pos+1);
+					$positionarray[] = $pos;
+				}
 				
-				$papers=array();
-				foreach($xml->IdList->Id as $uid){
-				 	$papers[]=$uid;
-				 }
-				 $paperInfo = array(
-				 			'papers'=>$papers,
-				 			'count'=>$count,
-				 			);
-				return $paperInfo;		
+				return $positionarray;
 			}
+			else {
+				return FALSE;
+			}
+	
+		}			
+		
+		function separateOccurences($occurenceArray,$string){
+			$start=0;
+			$piecesArray=array();
+			$length=strlen($string);
+			foreach($occurenceArray as $key=>$value){
+				$end=$value-$start;
+				$piece=substr($string,$start,$end);
+				$piece=trim(str_replace(';','',$piece));
+				$pieceArray[]=$piece;
+				$start=$value;
+				
+			}
+			$lastpiece=trim(str_replace(';','',substr($string,$value,$length)));
+			$pieceArray[]=$lastpiece;
+			return $pieceArray;
+		}
+		function separateDates($array){
+			$dateArray=array();
+			$stringArray=array();
+			$returnArray=array(
+				'date'=>'',
+				'string'=>'',
 			
+			);
+			foreach($array as $key=>$value){
+				$end=strlen($value);
+				$cutoff=strpos($value,':');	
+				$date=substr($value,0,$cutoff);
+				$string=str_replace(':','',substr($value,$cutoff,$end));
+				echo $date." VALUE ".$string. "<BR>";
+				$dateArray[]=$date;
+				$stringArray[]=$string;		
+			}
+			$returnArray['date']=$dateArray;
+			$returnArray['string']=$stringArray;
+			return $returnArray;
 		}
 		
-//accepts a UID and returns a multi-dimensional array with all the desired paper fields along with all coauthors. More fields can be added from pubmed if required.			
-		function eSummary($uid){
+		function separateDegrees($array){
+			$degrees=array('ba','bs','md','phd','bd','ms');
+			foreach($array as $value){
+				$value=strtolower($value);
+				//echo $value."<BR>";
+				$cutoff=strpos($value,',');	
+				$test=trim(substr($value,0,$cutoff));	
+				//echo $test;			
+				if(in_array($test,$degrees)){
+					echo $value;
+				
+				}
 			
-			$sumParams = array(
-   		 		'db' => 'pubmed',
-				'tool' => 'SCUcitationminer',
-				'email' => 'parnaudo@scu.edu',
-    			'id' => $uid,
-   		 	);	
-   		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?". http_build_query($sumParams,'','&'); 
-  		     
+			}
+		
+		}
+
+	}
+	Class dataMiner{
 	
-			$xml = simplexml_load_file($url);
-  	  		foreach( $xml->children() as $docsum){
-  	  		
- //XML that describes the articles 
-				foreach($docsum->children() as $item){	
-					$attributeName = $item->attributes();
-//add more fields from the XML if desired					
-					if(strpos($attributeName,"FullJournalName")===0){
-						$journal = $item[0];	
-					}
-					if(strpos($attributeName,"ESSN")===0){
-						$ISSN = str_replace('-',"",$item[0]);	
-					}
-					if(strpos($attributeName,"Title")===0){
-						$title= $item[0];	
-					}
-					if(strpos($attributeName,"PubDate")===0){
-						$pubdate= $item[0];	
-					}
-					if(strpos($attributeName,"AuthorList")===0){
-						$lastAuthor=$item->count();
-						$countAuthors = 1;
-//get position and name of each author, stick it in array
-			 			foreach($item->children() as $author){
-							if($countAuthors===$lastAuthor){
-								$countAuthors='500';
+	//Input is an array of terms for search, including pubmed keywords ex: array("Kurtzke JF [AUTHOR]","MULTIPLE SCLEROSIS [MESH FIELDS]"), $count is 1 if a count is desired, otherwise array of UIDs will be returned
+			function eSearch($input,$countFlag){
+				$query='';
+				$query=implode(" AND ", $input);
+				print "<br>Searching for: $query\n";
+	 		 	$params = array(
+	    			'db' => 'pubmed',
+	   				'retmode' => 'xml',
+	    			'retmax' => 500,
+	    			'usehistory' => 'y',
+					'tool' => 'SCUcitationminer',
+					'email' => 'parnaudo@scu.edu',
+	    			'term' => $query,
+	//also can add MeSH terms here for more granularity
+	    		);
+	 			$url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' . http_build_query($params);
+				echo $url;
+	//Retrieve the pubmed UIDs to then retrieve summaries for
+	  			$xml = simplexml_load_file($url);
+				$count= (int) $xml->Count;
+	//if set, just return count			
+				if($countFlag==1){
+					return $count;	
+				}
+	//otherwise return set of UIDs that were returned from the query
+				else{
+					
+					$papers=array();
+					foreach($xml->IdList->Id as $uid){
+					 	$papers[]=$uid;
+					 }
+					 $paperInfo = array(
+					 			'papers'=>$papers,
+					 			'count'=>$count,
+					 			);
+					return $paperInfo;		
+				}
+				
+			}
+			
+	//accepts a UID and returns a multi-dimensional array with all the desired paper fields along with all coauthors. More fields can be added from pubmed if required.			
+			function eSummary($uid){
+				
+				$sumParams = array(
+	   		 		'db' => 'pubmed',
+					'tool' => 'SCUcitationminer',
+					'email' => 'parnaudo@scu.edu',
+	    			'id' => $uid,
+	   		 	);	
+	   		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?". http_build_query($sumParams,'','&'); 
+	  		     
+		
+				$xml = simplexml_load_file($url);
+	  	  		foreach( $xml->children() as $docsum){
+	  	  		
+	 //XML that describes the articles 
+					foreach($docsum->children() as $item){	
+						$attributeName = $item->attributes();
+	//add more fields from the XML if desired					
+						if(strpos($attributeName,"FullJournalName")===0){
+							$journal = $item[0];	
+						}
+						if(strpos($attributeName,"ESSN")===0){
+							$ISSN = str_replace('-',"",$item[0]);	
+						}
+						if(strpos($attributeName,"Title")===0){
+							$title= $item[0];	
+						}
+						if(strpos($attributeName,"PubDate")===0){
+							$pubdate= $item[0];	
+						}
+						if(strpos($attributeName,"AuthorList")===0){
+							$lastAuthor=$item->count();
+							$countAuthors = 1;
+	//get position and name of each author, stick it in array
+				 			foreach($item->children() as $author){
+								if($countAuthors===$lastAuthor){
+									$countAuthors='500';
+								}
+								
+								$authorRecord=array(
+									'name'=>$author,
+									'position'=>$countAuthors,
+								);
+								$authors[]=$authorRecord;
+								$countAuthors++;
 							}
-							
-							$authorRecord=array(
-								'name'=>$author,
-								'position'=>$countAuthors,
-							);
-							$authors[]=$authorRecord;
-							$countAuthors++;
 						}
 					}
 				}
-			}
-			
-			$paperInfo=array(
-				'journal'=> $journal,
-				'title'=> $title,
-				'pubDate'=> $pubdate,
-				'lastAuthor'=> $lastAuthor,
-				'coAuthors'=> $authors,
-				'ISSN'=>$ISSN,
-			
-			);
-			return $paperInfo;
-		}
-		function eFetch($uid){
-			$sumParams = array(
-   		 		'db' => 'pubmed',
-				'tool' => 'SCUcitationminer',
-				'email' => 'parnaudo@scu.edu',
-				'retmode' => 'xml',
-    			'id' => $uid,
-   		 	);
-   		 	
-   		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?". http_build_query($sumParams,'','&'); 
-   		 	 $url=str_replace('%5B0%5D','',$url);
-			 echo $url;
-			$xml = simplexml_load_file($url);
-			$bookTest= $xml->xpath('/PubmedArticleSet/PubmedBookArticle/BookDocument');
-			$bookTitle=$bookTest[0]->Book->BookTitle;
-			if($bookTitle!=''){
-				echo $bookTitle;
-				return;
-			}
-			else{
-  	  		$result = $xml->xpath('/PubmedArticleSet/PubmedArticle/MedlineCitation');
-				//pull whatever you want from the XML, these two are not available from eSummary
-  	  		 	$date=$result[0]->Article->Journal->JournalIssue->PubDate->Day." ".$result[0]->Article->Journal->JournalIssue->PubDate->Month." ".$result[0]->Article->Journal->JournalIssue->PubDate->Year;
-				if( $result[0]->Article->AuthorList->Author !=NULL){
-					$authorCount= $result[0]->Article->AuthorList->Author->count();
-				}
-				else {
-					$authorCount=0;	
-				}
-				$authors=$result[0]->Article->AuthorList->Author;
-				$lastAuthor=$authors[$authorCount]->LastName." ".$authors[$authorCount]->Initials;
 				
-  	  		 	$paperInfo=array(
-					'affiliation'=> $result[0]->Article->Affiliation,
-					//'abstract'=> $result[0]->Article->Abstract->AbstractText,
-					'ISSN'=>str_replace('-',"",$result[0]->Article->Journal->ISSN),
-					'journal'=>$result[0]->Article->Journal->Title,
-					'pubDate'=>$date,
-					'title'=>$result[0]->Article->ArticleTitle,
-					'authors'=>$result[0]->Article->AuthorList,
-					'lastAuthor'=>$lastAuthor,
-					'pubType'=>$result[0]->Article->PublicationTypeList,
-					'authorCount'=>$authorCount,
-			);
-		}
-						
-			return $paperInfo;
+				$paperInfo=array(
+					'journal'=> $journal,
+					'title'=> $title,
+					'pubDate'=> $pubdate,
+					'lastAuthor'=> $lastAuthor,
+					'coAuthors'=> $authors,
+					'ISSN'=>$ISSN,
+				
+				);
+				return $paperInfo;
+			}
+			function eFetch($uid){
+				$sumParams = array(
+	   		 		'db' => 'pubmed',
+					'tool' => 'SCUcitationminer',
+					'email' => 'parnaudo@scu.edu',
+					'retmode' => 'xml',
+	    			'id' => $uid,
+	   		 	);
+	   		 	
+	   		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?". http_build_query($sumParams,'','&'); 
+	   		 	 $url=str_replace('%5B0%5D','',$url);
+				 echo $url;
+				$xml = simplexml_load_file($url);
+				$bookTest= $xml->xpath('/PubmedArticleSet/PubmedBookArticle/BookDocument');
+				$bookTitle=$bookTest[0]->Book->BookTitle;
+				if($bookTitle!=''){
+					echo $bookTitle;
+					return;
+				}
+				else{
+	  	  		$result = $xml->xpath('/PubmedArticleSet/PubmedArticle/MedlineCitation');
+					//pull whatever you want from the XML, these two are not available from eSummary
+	  	  		 	$date=$result[0]->Article->Journal->JournalIssue->PubDate->Day." ".$result[0]->Article->Journal->JournalIssue->PubDate->Month." ".$result[0]->Article->Journal->JournalIssue->PubDate->Year;
+					if( $result[0]->Article->AuthorList->Author !=NULL){
+						$authorCount= $result[0]->Article->AuthorList->Author->count();
+					}
+					else {
+						$authorCount=0;	
+					}
+					$authors=$result[0]->Article->AuthorList->Author;
+					$lastAuthor=$authors[$authorCount]->LastName." ".$authors[$authorCount]->Initials;
+					
+	  	  		 	$paperInfo=array(
+						'affiliation'=> $result[0]->Article->Affiliation,
+						//'abstract'=> $result[0]->Article->Abstract->AbstractText,
+						'ISSN'=>str_replace('-',"",$result[0]->Article->Journal->ISSN),
+						'journal'=>$result[0]->Article->Journal->Title,
+						'pubDate'=>$date,
+						'title'=>$result[0]->Article->ArticleTitle,
+						'authors'=>$result[0]->Article->AuthorList,
+						'lastAuthor'=>$lastAuthor,
+						'pubType'=>$result[0]->Article->PublicationTypeList,
+						'authorCount'=>$authorCount,
+				);
+			}
+							
+				return $paperInfo;
   	  		
 		}	
 	

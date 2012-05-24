@@ -2,68 +2,34 @@
 include("lib/init.php");
 $Start = getTime(); 
 $dataminer=new dataMiner;
-$queryDoctors = "select * from topneurologistsnetworkmeasures where location IS NULL";
-echo $queryDoctors;
-//$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
-$result = mysql_query($queryDoctors) or die(mysql_error());
-while($row=mysql_fetch_array($result)){
-	$break=0;
-  	$author='';
-  	$query=array();
-	$count=0;
-	$filter="[AUTHOR]";
-	$author=$row['authorName'].$filter; //your query term, searches for both middle name and middle initials	
-	$query[]=$author;
-	echo $author."<BR>";
-	$uids=$dataminer->eSearch($query,0);
-		foreach($uids['papers'] as $key=>$paperID){
+$filter="(MULTIPLE SCLEROSIS [MESH FIELDS] AND CLINICAL TRIAL [TYPE])";
+//query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
+$queryDoctors = "select medschool,residency,fellowship from schizo where id IN (109028)";
+$string="1970: BA, Miami University; 2001-2002: MD, George Washington University; 1975-79: NOTINTHELEA, Psychiatry, St. Vincent";
+function stringProcess($string){
+		$test=strpos($string,';');
 		
-		echo "TRYING PAPER: ".$paperID."<BR>";
-		  
-		  $paperInfo=$dataminer->eFetch($paperID);
-		  if(strlen($paperInfo['affiliation'])<1){
-			echo "NO STRING<BR>";		  
+		echo $test;
+}
+$find=';';
+$textManipulate= new textManipulate;
 
-		  }
-		  else{
-		  foreach($paperInfo['authors'] as $field){
-				$authorPosition=0;
-			  foreach($field->children() as $authors){
-				  
-				  $authorPosition++;
-				  $pubmedName=$authors->LastName." ".$authors->Initials;
-				  $lastName=$authors->LastName;
-				  $foreName=$authors->ForeName;
-				  echo $pubmedName. " ". $authorPosition;
-				  if(stripos($author,$pubmedName)===0){
-						echo $authorPosition."<BR>";
-					 if($authorPosition==1){
-					 	$updateQuery="UPDATE topneurologistsnetworkmeasures set location='".mysql_escape_string($paperInfo['affiliation'])."' where Id='".$row['Id']."'";
-						echo $updateQuery;
-						mysql_query($updateQuery) or die ("Error in query: $query. ".mysql_error());
-						$break=1;
-					 }
-											 
-					}
-				  else{
-				  	break;
-				  
-				  }
-					if($break==1){
-						echo "BREAKING";
-						break 3;	
-					}	
-		/*		  
-			 if($paperInfo['affiliation']!=''){
-			 	$updateQuery="UPDATE topneurologistsnetworkmeasures set location='".$paperInfo['affiliation']."' where atomId='".$row['atomId']."'";
-			 echo $updateQuery."<BR>";
-		 	}*/
-			}
-		 }
-	  }
+$test=$textManipulate->findOccurences($string, $find);
+print_r($test);
+echo "<BR>";
+$test=$textManipulate->separateOccurences($test,$string);
+print_r($test);
+echo "<BR>";
+$test=$textManipulate->separateDates($test,$string);
+$textManipulate->separateDegrees($test['string']);
+
+//	echo $author."<BR>"
+	if(!empty($filter)){
+		$query[]=$filter;
 	}
+//	$uids=$dataminer->eSearch($query,0);
 //if there are papers, insert an author record	
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs";
-}
+
 ?>
