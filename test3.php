@@ -2,59 +2,72 @@
 include("lib/init.php");
 $Start = getTime(); 
 $dataminer=new dataMiner;
-$queryDoctors = "select * from topneurologistsnetworkmeasures where firstName IS NULL ";
-echo $queryDoctors;
+$queryNodes = "select source, count(target) as degree from edge group by source order by degree desc;";
 //$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
-$result = mysql_query($queryDoctors) or die(mysql_error());
+$result = mysql_query($queryNodes) or die(mysql_error());
+$allNodes=array();
+$test=array();
 while($row=mysql_fetch_array($result)){
-	$break=0;
-  	$author='';
-  	$query=array();
+	$test[]=getNode($row['source']);	
+	/*print_r($test);
+	echo "<BR>";*/
+
+}
+$array1=array(2,6,8,10,11);
+$array2=array(6,8,9);
+$array3=array(4,6,7);
+$array4=array(1,3,5);
+$array5=array(12,13,14);
+$set=array($array1,$array2,$array3,$array4,$array5);
+
+for($q=0;$q < 1; $q++){
+	$newSet=arrayCompare($test);	
+	$set[]=$newSet;
+	print_r($newSet);
+	echo "<BR>";
+	$q++;
+}
+	
+print_r($newSet);
+function arrayCompare($set){
+	$bestSet=array();
+	$testSet=array();
+	$bestCount=0;
 	$count=0;
-	$filter="[AUTHOR]";
-	$author=$row['authorName'].$filter; //your query term, searches for both middle name and middle initials	
-	$query[]=$author;
-	echo $author."<BR>";
-	$uids=$dataminer->eSearch($query,0);
-		foreach($uids['papers'] as $key=>$paperID){
-		echo "TRYING PAPER: ".$paperID."<BR>";
-		  $paperInfo=$dataminer->eFetch($paperID);
-		  foreach($paperInfo['authors'] as $field){
-				$authorPosition=0;
-			  foreach($field->children() as $authors){
-				  $authorPosition++;
-				  $pubmedName=$authors->LastName." ".$authors->Initials;
-				  $lastName=$authors->LastName;
-				  $foreName=$authors->ForeName;
-				 // echo $pubmedName. " ". $authorPosition;
-				  if(stripos($author,$pubmedName)===0){
-					 	$test=stripos($foreName," ");
-						echo $test;
-						echo $foreName;
-					 if($test > 2 || $test===false){
-						if(strlen($foreName) > 1){
-					 	$updateQuery="UPDATE topneurologistsnetworkmeasures set firstName='".$foreName."' where Id='".$row['Id']."'";						
-						mysql_query($updateQuery) or die ("Error in query: $query. ".mysql_error());
-							$break=1;
-						}
-					 }
-											 
-					}
-					if($break==1){
-						echo "BREAKING";
-						break 3;	
-					}	
-		/*		  
-			 if($paperInfo['affiliation']!=''){
-			 	$updateQuery="UPDATE topneurologistsnetworkmeasures set location='".$paperInfo['affiliation']."' where atomId='".$row['atomId']."'";
-			 echo $updateQuery."<BR>";
-		 	}*/
+	for($i=0;$i < sizeof($set);$i++){
+		for($k=0;$k <sizeof($set);$k++){
+			if($k!==$i){
+				$testSet=array_unique(array_merge($set[$i],$set[$k]));
+				$count=count($testSet);
 			}
-		 }
-	  
+			if($count > $bestCount){
+				$bestSet=$testSet;
+				$bestIndex=array($i,$k);
+				$bestCount=$count;
+			}
+		}
 	}
+	return $bestSet;
+}
+
+
+function saturationNodes($set,$number){
+
+}
+
+function getNode($node){
+	$targets=array();
+	$filter="WHERE source=".$node;
+	$nodeSelect="SELECT target from edge ".$filter;
+	$result=mysql_query($nodeSelect);
+	while($row=mysql_fetch_array($result)){	
+		$targets[]=$row['target'];
+		//echo $row['target']." FROM NODE: ".$node."<BR>";
+	}
+	return $targets;
+}
 //if there are papers, insert an author record	
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs";
-}
+
 ?>
