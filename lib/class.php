@@ -62,10 +62,12 @@
 				$value=strtolower($value);
 				//echo $value."<BR>";
 				$cutoff=strpos($value,',');	
-				$test=trim(substr($value,0,$cutoff));	
+				$length=strlen($value);
+				$type=trim(substr($value,0,$cutoff));	
+				$name=trim(str_replace(',','',substr($value,$cutoff,$length)));
 				//echo $test;			
-				if(in_array($test,$degrees)){
-					echo $value;
+				if(in_array($type,$degrees)){
+					echo $name."<BR>";
 				
 				}
 			
