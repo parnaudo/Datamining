@@ -180,6 +180,32 @@ $result=mysql_query($particlecount) or die(mysql_error());
 	
 return $matterArray;
 }
+function getOrgInfo($isotopeId,$atomId,$table){
+	$orgArray=array(
+		'institution'=>'',
+		'city'=>'',
+		'state'=>''
+	);
+	$getOrgValues="SELECT name,value from particles p INNER JOIN matters m ON m.matterId=p.matterId WHERE isotopeId=".$isotopeId;
+	$orgResult=mysql_query($getOrgValues);
+	while($orgRow=mysql_fetch_array($orgResult)){
+		if(stripos($orgRow['name'],'institution')!==FALSE && stripos($orgRow['name'],'multi')===FALSE && stripos($orgRow['name'],'NPI')===FALSE){
+			echo $orgRow['name']. ": ".$orgRow['value']."<BR>";
+			$orgArray['institution']=$orgRow['value'];
+		}
+		if($orgRow['name']==='City'){
+			$orgArray['city']=$orgRow['value'];		
+			echo $orgRow['name']. ": ".$orgRow['value']."<BR>";		
+		}
+		if($orgRow['name']==='State'){
+			$orgArray['state']=$orgRow['value'];			
+			echo $orgRow['name']. ": ".$orgRow['value']."<BR>";		
+		}
+	}
+	$insertQuery="INSERT INTO ".$table." (institution,city,state,atomId) VALUES ('".mysql_escape_string($orgArray['institution'])."','".mysql_escape_string($orgArray['city'])."','".mysql_escape_string($orgArray['state'])."','".$atomId."')";
+	mysql_query($insertQuery);
+
+}
 
 function getTime() 
     { 
@@ -196,6 +222,27 @@ function hasDuplicates($array){
   }
  }
  return false;
+}
+function insertEdge($valueArray){
+/*
+USAGE FOR VALUE ARRAY:
+$valueArray=array(
+	'source'=>'12345',
+	'target'=>'67890',
+	'weight'=>'1.456',
+	'direction'=>'Undirected',
+	'class'=>'1'
+);
+Only source and target are required
+*/
+$variables=array();
+foreach($valueArray as $name=>$value){
+		$variables[]=mysql_escape_string($name);
+		$values[]=mysql_escape_string($value);
+	}
+	$insertQuery="INSERT INTO edge (".implode(",",$variables).") VALUES ('".implode("','",$values)."')";
+	mysql_query($insertQuery);
+echo $insertQuery."<BR>";
 }
 
 function percentile($data,$percentile){ 
