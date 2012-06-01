@@ -64,14 +64,7 @@ while($row=mysql_fetch_array($result)){
 				}	
 		    else {
 				$insertRelationQuery="INSERT INTO relationship (coAuthor, authorAtom, relationship, paperCount,targetDoc) VALUES ('".$rowInstance['coAuthor']."','".$author."','".$score."','1','".$targetDocFlag."')";
-				$valueArray=array(
-					'source'=>$rowInstance['coAuthor'],
-					'target'=>$author,
-					'weight'=>$score,
-					'class'=>'2'
-				);
-				insertEdge($valueArray);
-						
+
 				echo $insertRelationQuery."<BR>";
 				mysql_query($insertRelationQuery);			
 				}
@@ -79,7 +72,8 @@ while($row=mysql_fetch_array($result)){
 	}
 
 
-}				
+}
+transferAuthorEdges('edge');				
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." seconds";
 ?>
