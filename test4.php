@@ -1,14 +1,15 @@
 <?php 
 include("lib/init.php");
-$Start = getTime(); 
-$dataminer=new dataMiner;
-$queryDoctors = "select id, phone from `update`";
-//$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
-$result = mysql_query($queryDoctors) or die(mysql_error());
-while($row=mysql_fetch_array($result)){
-	$updateQuery="UPDATE neurologist set phone='".$row['phone']."' where id=".$row['id'];
-	echo $updateQuery;
-	mysql_query($updateQuery);
-}
+$sources=array(100,150,200,250,300,350);
+		for($i=0;$i < sizeof($sources);$i++){
+			for($k=0;$k <sizeof($sources);$k++){
+				if($i!==$k){
+					$insertEdge="INSERT INTO edgeCache (source,target,direction,weight) VALUES (".$sources[$i].",".$sources[$k].",Undirected,8.0)";
+					echo $insertEdge."<BR>";
+				
+				}
+			}
+		}
+
 	
 ?>

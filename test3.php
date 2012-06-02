@@ -13,18 +13,24 @@ while($row=mysql_fetch_array($result)){
 	$getSources="SELECT source from edge where class=1 and target=".$row['target'];
 	$resultSources = mysql_query($getSources) or die(mysql_error());
 	$testRows=mysql_num_rows($resultSources);
-
+	$sources=array();
 	if($testRows > 1){	
 		while($rowSources=mysql_fetch_array($resultSources)){
 			$sources[]=$rowSources['source'];
 			$count++;
 	
 		}
-		foreach($sources as $key=>$value){
-			echo $key. " KEY IS ".$value."<BR>";
-			
-		
+		for($i=0;$i < sizeof($sources);$i++){
+			for($k=0;$k <sizeof($sources);$k++){
+				if($i!==$k){
+					$insertEdge="INSERT INTO edgeCache (source,target,direction,weight) VALUES ('".$sources[$i]."','".$sources[$k]."','Undirected','8.0')";
+					echo $insertEdge."<BR>";
+					mysql_query($insertEdge);
+				
+				}
+			}
 		}
+		echo "NEW INSTITUTION<BR>";
 	}
 
 	
