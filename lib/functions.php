@@ -170,6 +170,13 @@ function getAtomId($authorId){
 	$row=mysql_fetch_array($result);
 	return $row['atomId'];
 }
+function edgeExists($source,$target,$table){
+	$query="SELECT * from ".$table." WHERE source=".$source." AND target=".$target;
+	$result=mysql_query($query);
+	$existFlag=mysql_num_rows($result);
+	//echo $query." RESULTS IN ".$test." <BR>";
+	return $existFlag;
+}
 function getMostPopulatedMatters($threshold){
 	$matterArray=array();
 	
@@ -230,7 +237,7 @@ function hasDuplicates($array){
  }
  return false;
 }
-function insertEdge($valueArray){
+function insertEdge($valueArray,$table){
 /*
 USAGE FOR VALUE ARRAY:
 $valueArray=array(
@@ -247,7 +254,8 @@ foreach($valueArray as $name=>$value){
 		$variables[]=mysql_escape_string($name);
 		$values[]=mysql_escape_string($value);
 	}
-	$insertQuery="INSERT INTO edge (".implode(",",$variables).") VALUES ('".implode("','",$values)."')";
+	$insertQuery="INSERT INTO ".$table." (".implode(",",$variables).") VALUES ('".implode("','",$values)."')";
+	//echo $insertQuery."<BR>";
 	mysql_query($insertQuery);
 }
 
