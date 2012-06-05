@@ -48,8 +48,8 @@
 			$stringArray=array();
 			$returnArray=array(
 				'date'=>'',
-				'string'=>'',
-			
+				'name'=>'',
+				'type'=>'',			
 			);
 			foreach($array as $key=>$value){
 				$end=strlen($value);
@@ -60,8 +60,35 @@
 				$dateArray[]=$date;
 				$stringArray[]=$string;		
 			}
+
+			$type='';
+			$name='';
+			$nameArray=array();
+			$typeArray=array();
+			$degrees=array('ba','bs','md','phd','bd','ms','ma','scb','sc','mph');
+			foreach($stringArray as $value){
+				$value=strtolower($value);
+				echo $value."<BR>";
+				$cutoff=strpos($value,',');	
+				$length=strlen($value);
+				$type=trim(substr($value,0,$cutoff));
+				$name=trim(str_replace(',','',substr($value,$cutoff,$length)));
+				//echo $test;	
+				foreach($degrees as $value){
+					if(strpos($type,$value)!==FALSE){
+						$degreeFlag=1;
+						$nameArray[]=mysql_escape_string($name);
+						$typeArray[]=$type;
+						echo "HAS DEGREE: ".$name."<BR>";
+						echo "TYPE: ".$type."<BR>";	
+						break;
+					}
+
+				}		
+			}
 			$returnArray['date']=$dateArray;
-			$returnArray['string']=$stringArray;
+			$returnArray['name']=$nameArray;
+			$returnArray['type']=$typeArray;			
 			return $returnArray;
 		}
 		

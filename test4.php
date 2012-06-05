@@ -1,5 +1,6 @@
 <?php 
 include("lib/init.php");
+function
 $query="select * from edge where class=2";
 $result = mysql_query($query) or die(mysql_error());
 $sources=array();
@@ -19,12 +20,6 @@ while($row=mysql_fetch_array($result)){
 	
 	}
 }
-function edgeExists($source,$target,$table){
-	$query="SELECT * from ".$table." WHERE source=".$source." AND target=".$target;
-	$result=mysql_query($query);
-	$existFlag=mysql_num_rows($result);
-	//echo $query." RESULTS IN ".$test." <BR>";
-	return $existFlag;
-}
+
 
 ?>
