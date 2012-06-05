@@ -164,6 +164,19 @@ function deleteTable($insertTable){
 		if($debug)echo "Database deleted!";
 } 
 
+function getAtomId($authorId){
+	$query="SELECT atomId FROM authors where id=".$authorId;
+	$result=mysql_query($query);
+	$row=mysql_fetch_array($result);
+	return $row['atomId'];
+}
+function edgeExists($source,$target,$table){
+	$query="SELECT * from ".$table." WHERE source=".$source." AND target=".$target;
+	$result=mysql_query($query);
+	$existFlag=mysql_num_rows($result);
+	//echo $query." RESULTS IN ".$test." <BR>";
+	return $existFlag;
+}
 function getMostPopulatedMatters($threshold){
 	$matterArray=array();
 	
@@ -214,6 +227,7 @@ function getTime()
 
 	} 
 
+
 function hasDuplicates($array){
  $dupe_array = array();
  foreach($array as $val){
@@ -223,7 +237,7 @@ function hasDuplicates($array){
  }
  return false;
 }
-function insertEdge($valueArray){
+function insertEdge($valueArray,$table){
 /*
 USAGE FOR VALUE ARRAY:
 $valueArray=array(
@@ -240,9 +254,9 @@ foreach($valueArray as $name=>$value){
 		$variables[]=mysql_escape_string($name);
 		$values[]=mysql_escape_string($value);
 	}
-	$insertQuery="INSERT INTO edge (".implode(",",$variables).") VALUES ('".implode("','",$values)."')";
+	$insertQuery="INSERT INTO ".$table." (".implode(",",$variables).") VALUES ('".implode("','",$values)."')";
+	//echo $insertQuery."<BR>";
 	mysql_query($insertQuery);
-echo $insertQuery."<BR>";
 }
 
 function percentile($data,$percentile){ 
@@ -311,6 +325,27 @@ function scoringTransform($row, $col){
      //  echo "author X";
 	}	
 	return $coordinates=array($row,$col);
+}
+function transferAuthorEdges($table){
+	$queryNodes = "select authorAtom,coAuthor,relationship from ".$table;
+	//$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
+	$result = mysql_query($queryNodes) or die(mysql_error());
+	$allNodes=array();
+	$test=array();
+	while($row=mysql_fetch_array($result)){
+		$source=getAtomId($row['authorAtom']);
+		$target=getAtomId($row['coAuthor']);
+		$weight=$row['relationship'];
+		$valueArray=array(
+			'source'=>$source,
+			'target'=>$target,
+			'weight'=>$weight,
+			'direction'=>'Undirected',
+			'class'=>2
+		);	
+		insertEdge($valueArray);
+	}
+
 }
 function updateAuthorPosition(){
 //query to get doctor set, can really be from anywhere

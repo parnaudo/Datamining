@@ -1,10 +1,13 @@
 <?php 
+echo "OMG";
 include("../lib/init.php");
 $Start = getTime(); 
 $table='orgTemp';
 $dataminer=new dataMiner;
+
 clearTable($table);
 $queryDoctors = "select dstAtomId,srcIsotopeId, count(distinct atomBondId) from atomBonds where bondId in (3,7) and srcAtomId IN (select atomId from mixtureAtoms where mixtureId=1176) group by dstAtomId having count(distinct atomBondId) > 1 order by count( distinct atomBondId) desc";
+echo $queryDoctors;
 //$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
@@ -20,19 +23,12 @@ while($row=mysql_fetch_array($result)){
 		$valueArray=array(
 			'source'=>$source,
 			'target'=>$target,
-			'weight'=>'1.0',
+			'weight'=>'8.0',
 			'class'=>'1'
 		);
-		insertEdge($valueArray);
-		
+		insertEdge($valueArray,'edge');
 	}
 }
-
-
-
-
-
-
 		//	$updateQuery="UPDATE topneurologistsnetworkmeasures set firstName='".mysql_escape_string($firstName)."',lastName='".mysql_escape_string($lastName)."',middleName='".mysql_escape_string($middleName)."' where Id='".$row['id']."'";
 		//echo $updateQuery;
 		//mysql_query($updateQuery) or die ("Error in query: $query. ".mysql_error());

@@ -30,9 +30,8 @@ class MyCrawler extends PHPCrawler
      
     // Now you should do something with the content of the actual 
     // received page or file ($DocInfo->source), we skip it in this example  
-     
+     print_r($DocInfo->source);
     echo $lb; 
-     
     flush(); 
   }  
 } 
@@ -43,6 +42,7 @@ class MyCrawler extends PHPCrawler
 
 $crawler = new MyCrawler(); 
 $crawler->setPageLimit(1);
+echo $crawler->content='';
 // URL to crawl 
 $crawler->setURL("http://www.vitals.com/doctors/Dr_Richard_Rudick.html"); 
 

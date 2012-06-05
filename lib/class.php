@@ -19,62 +19,115 @@
 		}			
 		
 		function separateOccurences($occurenceArray,$string){
+//after finding the amounts of delimiters, separate values and return an array of the separated values
 			$start=0;
 			$piecesArray=array();
 			$length=strlen($string);
-			foreach($occurenceArray as $key=>$value){
-				$end=$value-$start;
-				$piece=substr($string,$start,$end);
-				$piece=trim(str_replace(';','',$piece));
-				$pieceArray[]=$piece;
-				$start=$value;
-				
+			if(is_array($occurenceArray)){
+				foreach($occurenceArray as $key=>$value){
+					$end=$value-$start;
+					$piece=substr($string,$start,$end);
+					$piece=trim(str_replace(';','',$piece));
+					$pieceArray[]=$piece;
+					$start=$value;
+					
+				}
+				$lastpiece=trim(str_replace(';','',substr($string,$value,$length)));
+				$pieceArray[]=$lastpiece;
+
 			}
-			$lastpiece=trim(str_replace(';','',substr($string,$value,$length)));
-			$pieceArray[]=$lastpiece;
+			else{
+				$pieceArray=array($string);
+			
+			}
 			return $pieceArray;
 		}
 		function separateDates($array){
+//separate dates from the string value for comparison
 			$dateArray=array();
 			$stringArray=array();
 			$returnArray=array(
 				'date'=>'',
-				'string'=>'',
-			
+				'name'=>'',
+				'type'=>'',			
 			);
 			foreach($array as $key=>$value){
 				$end=strlen($value);
 				$cutoff=strpos($value,':');	
 				$date=substr($value,0,$cutoff);
 				$string=str_replace(':','',substr($value,$cutoff,$end));
-				echo $date." VALUE ".$string. "<BR>";
+				//echo $date." VALUE ".$string. "<BR>";
 				$dateArray[]=$date;
 				$stringArray[]=$string;		
 			}
+
+			$type='';
+			$name='';
+			$nameArray=array();
+			$typeArray=array();
+			$degrees=array('ba','bs','md','phd','bd','ms','ma','scb','sc','mph');
+			foreach($stringArray as $value){
+				$value=strtolower($value);
+				echo $value."<BR>";
+				$cutoff=strpos($value,',');	
+				$length=strlen($value);
+				$type=trim(substr($value,0,$cutoff));
+				$name=trim(str_replace(',','',substr($value,$cutoff,$length)));
+				//echo $test;	
+				foreach($degrees as $value){
+					if(strpos($type,$value)!==FALSE){
+						$degreeFlag=1;
+						$nameArray[]=mysql_escape_string($name);
+						$typeArray[]=$type;
+						echo "HAS DEGREE: ".$name."<BR>";
+						echo "TYPE: ".$type."<BR>";	
+						break;
+					}
+
+				}		
+			}
 			$returnArray['date']=$dateArray;
-			$returnArray['string']=$stringArray;
+			$returnArray['name']=$nameArray;
+			$returnArray['type']=$typeArray;			
 			return $returnArray;
 		}
 		
 		function separateDegrees($array){
-			$degrees=array('ba','bs','md','phd','bd','ms');
+//takes array of string values that still have
+			$type='';
+			$name='';
+			$nameArray=array();
+			$typeArray=array();
+			$degrees=array('ba','bs','md','phd','bd','ms','ma','scb','sc','mph');
 			foreach($array as $value){
 				$value=strtolower($value);
-				//echo $value."<BR>";
+				echo $value."<BR>";
 				$cutoff=strpos($value,',');	
 				$length=strlen($value);
-				$type=trim(substr($value,0,$cutoff));	
+				$type=trim(substr($value,0,$cutoff));
+	
+
 				$name=trim(str_replace(',','',substr($value,$cutoff,$length)));
-				//echo $test;			
-				if(in_array($type,$degrees)){
-					echo $name."<BR>";
-				
-				}
-			
+				//echo $test;	
+				foreach($degrees as $value){
+					if(strpos($type,$value)!==FALSE){
+						$degreeFlag=1;
+						$nameArray[]=$name;
+						$typeArray[]=$type;
+						echo "HAS DEGREE: ".$name."<BR>";
+						echo "TYPE: ".$type."<BR>";	
+						break;
+					}
+
+				}		
 			}
+			$returnArray=array(
+			'name'=>$nameArray,
+			'type'=>$typeArray
+			);
+			return $returnArray;
 		
 		}
-
 	}
 	Class dataMiner{
 	
