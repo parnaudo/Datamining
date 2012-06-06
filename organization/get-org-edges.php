@@ -1,5 +1,4 @@
 <?php 
-echo "OMG";
 include("../lib/init.php");
 $Start = getTime(); 
 $table='orgTemp';

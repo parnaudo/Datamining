@@ -215,7 +215,7 @@ function getOrgInfo($isotopeId,$atomId,$table){
 			echo $orgRow['name']. ": ".$orgRow['value']."<BR>";		
 		}
 	}
-	$insertQuery="INSERT INTO ".$table." (institution,city,state,atomId) VALUES ('".mysql_escape_string($orgArray['institution'])."','".mysql_escape_string($orgArray['city'])."','".mysql_escape_string($orgArray['state'])."','".$atomId."')";
+	$insertQuery="INSERT INTO ".$table." (isotopeId,institution,city,state,atomId) VALUES ('".$isotopeId."','".mysql_escape_string($orgArray['institution'])."','".mysql_escape_string($orgArray['city'])."','".mysql_escape_string($orgArray['state'])."','".$atomId."')";
 	mysql_query($insertQuery);
 
 }

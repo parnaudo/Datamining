@@ -6,47 +6,32 @@ $Start = getTime();
 
 $dataminer=new dataMiner;
 $table="orgTemp";
-clearTable($table);
-$atomQuery="select distinct m.atomId, p.value,p.isotopeId,tableId  from mixtureAtoms m inner join particles p on p.atomId=m.atomId where mixtureId=1176 and matterId=672 and p.value!='' order by value";
+$atomQuery="Select p.atomId,value,m.name,p.isotopeId,p.tableId,isFixed,m.matterId,s.address from matters m
+INNER JOIN particles p on p.matterId=m.matterId
+INNER JOIN schizo s on s.atomId=p.atomId
+where value!='' and isFixed=1 and m.matterId=617 
+ORDER BY m.name";
 $result=mysql_query($atomQuery);
+$count='';
+$stringreplace=array("-","&","(",")","|","/",",",".",";","=","#",":","'","+","?");
 while($row=mysql_fetch_array($result)){
+	$address=trim($row['address']);
 	$isotopeId=$row['isotopeId'];
 	$atomId=$row['atomId'];
-	$institution=$row['value'];
-	$queryTerms=array('address','city','state','zip code');
-	$address=array(
-		'address'=>'',
-		'city'=>'',
-		'state'=>'',
-		'zip'=>'',	
-	);	
-	foreach($queryTerms as $value){
-		$isotopeQuery="SELECT m.matterId,value from particles p INNER JOIN matters m ON p.matterId=m.matterId where isotopeId=".$isotopeId." AND name like '".$value."%' and value!=''";
-		echo $isotopeQuery;
-		$addressRecords=mysql_query($isotopeQuery);
-
-		while($addressRow=mysql_fetch_array($addressRecords)){
-			if(stripos('state',$value)===0){
-				$address['state']=$addressRow['value'];
-			} 
-			if(stripos($value,'address')===0){
-				$address['address']=$addressRow['value'];
-			} 
-			if(stripos($value,'city')===0){
-				$address['city']=$addressRow['value'];
-			} 
-			if(stripos($value,'zip')===0){
-				$address['zip']=$addressRow['value'];
-			} 							
-		}
+	$position=$row['value'];
+	$testQuery="select value,name,m.matterId from particles p INNER JOIN matters m on p.matterId=m.matterId where isotopeId=".$isotopeId." AND m.matterId=159 AND value!=''";
+	$testResult=mysql_query($testQuery);
+	while($testRow=mysql_fetch_array($testResult)){
+		$value=trim($testRow['value']);	
+	if(stripos($address,$value)!==FALSE||stripos($value,$address)!==FALSE){
+		echo "POSITION ".$position;
+		echo " MATCH HERE ";
+		$count++;
+			
 	}
-	$insertQuery="INSERT INTO ".$table." (isotopeId,atomId,institution,address,city,state,zipcode,tableId) VALUES (".$isotopeId.",".$atomId.",'".mysql_escape_string($institution)."','".mysql_escape_string($address['address'])."','".mysql_escape_string($address['city'])."','".$address['state']."','".$address['zip']."','".$row['tableId']."')";
-mysql_query($insertQuery);
-echo $insertQuery;
-echo "<BR>";
+		echo "ORIGINAL ADDRESS: ".$address." TEST ADDRESS: ".$value." ".$atomId."<BR>";
+	}
 }
-
-
 $End = getTime(); 
-echo "Time taken = ".number_format(($End - $Start),2)." secs";
+echo "Time taken = ".number_format(($End - $Start),2)." secs with matches ".$count;
 ?>

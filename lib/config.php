@@ -3,8 +3,8 @@
 $connection = array(
 	'host' => 'localhost',
 	'user' => 'root',
-	'pass' => 'root',
-	'db' => 'zephyr2'
+	'pass' => 'rubberbabybuggybumpers',
+	'db' => 'zephyr'
 );
 
 $mysql = new mysql($connection);

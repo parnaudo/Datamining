@@ -51,7 +51,7 @@ while($row=mysql_fetch_array($result)){
 		$resultRelation=mysql_query($relationTest);
 		$relationFlag = mysql_num_rows($resultRelation);
 //Look for instances already
-		if($targetDocFlag > 0){
+	
 //ONly looking for physicians in group	
 			if($relationFlag > 0 ){
 				$rowRelation=mysql_fetch_array($resultRelation);
@@ -66,7 +66,7 @@ while($row=mysql_fetch_array($result)){
 				mysql_query($insertRelationQuery);			
 				}
 		}
-	}
+	
 
 
 }				

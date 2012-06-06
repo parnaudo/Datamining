@@ -7,7 +7,7 @@ include("lib/init.php");
 $Start = getTime(); 
 $row = 1;
 //Open input CSV format should be first column ID, then First name, Middle name and Last name in order
-if (($handle = fopen("endopubtolookup.csv", "r")) !== FALSE) {
+if (($handle = fopen("PrePubMedRheumatologists-3_May_2012.csv", "r")) !== FALSE) {
     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
         $queryString='';
 
@@ -37,7 +37,7 @@ if (($handle = fopen("endopubtolookup.csv", "r")) !== FALSE) {
 		$queryNPI='';
 		$queryNPI=$data[0];
 		//$query = $queryString.'[Author] AND (endocrinology OR diabetes)[MESH FIELDS]';
-		$query = $queryString.'[Full Author Name] AND (endocrinology OR diabetes)[MESH FIELDS] '; // for example AND (endocrinology OR diabetes) AND ("2001"[Date - Publication] : "3000"[Date - Publication])
+		$query = $queryString.'[Full Author Name] AND Rheumatoid Arthritis [MESH FIELDS] '; // for example AND (endocrinology OR diabetes) AND ("2001"[Date - Publication] : "3000"[Date - Publication])
 		echo "trying: ". $query;
 		//Lets see if there are any hits
 		pubmed_fetch($query, $queryNPI);
@@ -63,7 +63,7 @@ function pubmed_fetch($query, $queryNPI){
   
   $url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?' . http_build_query($params);
   
-   echo $url;
+
    //retrieve XML
   $xml = simplexml_load_file($url);
   
@@ -89,7 +89,7 @@ function pubmed_fetch($query, $queryNPI){
   system(sprintf("wget --output-document=%s %s", escapeshellarg($file), escapeshellarg($url)));
 
 //Write NPI, query term and count to output CSV
-  $fp = fopen('endoCitationCounts.csv', 'a+');
+  $fp = fopen('PrePubMedRheumatologists-3_May_2012-results.csv', 'a+');
 	$list=array(
 		array($queryNPI,$query,$count)
 		);
