@@ -1,6 +1,5 @@
 <?php
-	global $debug;
-	$debug=1;
+
 	
 function authorPubmedTransform($first,$middle,$last){
 	 $middle=substr($middle,0,1);
@@ -53,7 +52,6 @@ function clearAuthorTables(){
 }
 function clearTable($insertTable){
 		mysql_query("DELETE FROM ".$insertTable."");
-		if($debug)echo "Database deleted!";
 } 
 function createInstanceTable($insertTable){
 	
@@ -200,6 +198,7 @@ function getOrgInfo($isotopeId,$atomId,$table){
 		'state'=>''
 	);
 	$getOrgValues="SELECT name,value from particles p INNER JOIN matters m ON m.matterId=p.matterId WHERE isotopeId=".$isotopeId;
+	echo $getOrgValues;
 	$orgResult=mysql_query($getOrgValues);
 	while($orgRow=mysql_fetch_array($orgResult)){
 		if(stripos($orgRow['name'],'institution')!==FALSE && stripos($orgRow['name'],'multi')===FALSE && stripos($orgRow['name'],'NPI')===FALSE){
@@ -237,7 +236,7 @@ function hasDuplicates($array){
  }
  return false;
 }
-function insertEdge($valueArray,$table){
+function insertQuery($valueArray,$table){
 /*
 USAGE FOR VALUE ARRAY:
 $valueArray=array(
@@ -247,7 +246,7 @@ $valueArray=array(
 	'direction'=>'Undirected',
 	'class'=>'1'
 );
-Only source and target are required
+table attributes are key
 */
 $variables=array();
 foreach($valueArray as $name=>$value){
@@ -328,7 +327,6 @@ function scoringTransform($row, $col){
 }
 function transferAuthorEdges($table){
 	$queryNodes = "select authorAtom,coAuthor,relationship from ".$table;
-	//$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
 	$result = mysql_query($queryNodes) or die(mysql_error());
 	$allNodes=array();
 	$test=array();

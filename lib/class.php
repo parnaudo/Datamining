@@ -42,7 +42,7 @@
 			}
 			return $pieceArray;
 		}
-		function separateDates($array){
+		function parseRecords($array){
 //separate dates from the string value for comparison
 			$dateArray=array();
 			$stringArray=array();
@@ -65,15 +65,16 @@
 			$name='';
 			$nameArray=array();
 			$typeArray=array();
-			$degrees=array('ba','bs','md','phd','bd','ms','ma','scb','sc','mph');
+			$degrees=array('ba','bs','md','phd','bd','ms','ma','scb','sc','mph','ab','aa');
 			foreach($stringArray as $value){
 				$value=strtolower($value);
-				echo $value."<BR>";
+				//echo $value."<BR>";
 				$cutoff=strpos($value,',');	
 				$length=strlen($value);
 				$type=trim(substr($value,0,$cutoff));
+				
 				$name=trim(str_replace(',','',substr($value,$cutoff,$length)));
-				//echo $test;	
+//search for different types of medical degrees 				
 				foreach($degrees as $value){
 					if(strpos($type,$value)!==FALSE){
 						$degreeFlag=1;
@@ -83,12 +84,22 @@
 						echo "TYPE: ".$type."<BR>";	
 						break;
 					}
+				}
 
+				if(sizeof($nameArray)==0){
+					if(stripos($value,'undergrad')!==FALSE){
+						$typeArray[]='bs';
+					}
+					else{
+						$nameArray[]=mysql_escape_string(strtolower($name));
+						$typeArray[]='unknown';					
+					}
 				}		
 			}
 			$returnArray['date']=$dateArray;
 			$returnArray['name']=$nameArray;
-			$returnArray['type']=$typeArray;			
+			$returnArray['type']=$typeArray;	
+			var_dump($returnArray);		
 			return $returnArray;
 		}
 		
@@ -101,12 +112,10 @@
 			$degrees=array('ba','bs','md','phd','bd','ms','ma','scb','sc','mph');
 			foreach($array as $value){
 				$value=strtolower($value);
-				echo $value."<BR>";
+				//echo $value."<BR>";
 				$cutoff=strpos($value,',');	
 				$length=strlen($value);
 				$type=trim(substr($value,0,$cutoff));
-	
-
 				$name=trim(str_replace(',','',substr($value,$cutoff,$length)));
 				//echo $test;	
 				foreach($degrees as $value){

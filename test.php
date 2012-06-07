@@ -24,10 +24,16 @@ while($row=mysql_fetch_array($result)){
 	while($testRow=mysql_fetch_array($testResult)){
 		$value=trim($testRow['value']);	
 	if(stripos($address,$value)!==FALSE||stripos($value,$address)!==FALSE){
-		echo "POSITION ".$position;
-		echo " MATCH HERE ";
-		$count++;
-			
+		//echo "POSITION ".$position;
+		//echo " MATCH HERE ";
+		$valueArray=array(
+			'atomId'=>$atomId,
+			'position'=>$position,
+			'isotopeId'=>$isotopeId
+		);
+		insertQuery($valueArray,'position');
+		$count++;	
+		
 	}
 		echo "ORIGINAL ADDRESS: ".$address." TEST ADDRESS: ".$value." ".$atomId."<BR>";
 	}

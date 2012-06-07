@@ -25,7 +25,7 @@ while($row=mysql_fetch_array($result)){
 			'weight'=>'8.0',
 			'class'=>'1'
 		);
-		insertEdge($valueArray,'edge');
+		//insertQuery($valueArray,'edge');
 	}
 }
 		//	$updateQuery="UPDATE topneurologistsnetworkmeasures set firstName='".mysql_escape_string($firstName)."',lastName='".mysql_escape_string($lastName)."',middleName='".mysql_escape_string($middleName)."' where Id='".$row['id']."'";

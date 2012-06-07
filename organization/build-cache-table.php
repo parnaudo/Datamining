@@ -32,7 +32,6 @@ while($row=mysql_fetch_array($result)){
 		}
 		echo "NEW INSTITUTION<BR>";
 	}
-
 	
 }
 $query="select * from edge where class=2";
@@ -50,7 +49,7 @@ while($row=mysql_fetch_array($result)){
 			'target'=>$row['target'],
 			'weight'=>$row['weight'],
 		);
-		insertEdge($valueArray,'edgeCache');
+		insertQuery($valueArray,'edgeCache');
 	
 	}
 }$End = getTime(); 
