@@ -4,52 +4,75 @@ $Start = getTime();
 $table="education";
 $attribute=array('residency','fellowship','medschool');
 
-clearTable($table);
-foreach($attribute as $attribute){
-	extractEducation($attribute,$table);
+$words  = array();
+$getEducation="SELECT distinct name,count(id)from education where years !='' group by name having count(id) > 1  order by count(id) desc,name, years";
+$educationResult=mysql_query($getEducation);
+$educationRow=mysql_fetch_array($educationResult);
+while($educationRow=mysql_fetch_array($educationResult)){
+	$break=strpos($educationRow['name'],' ');
+	$words[]=substr($educationRow['name'],0,$break);
 }
-$dataminer=new dataMiner;
-function extractEducation($attribute,$table){
-	$queryDoctors = "select atomId,".$attribute." from schizo where ".$attribute."!=''";
-	echo $queryDoctors;
-	//$queryDoctors = "select atomId,medschool from schizo where medschool!='' and atomId IN (1711601)";
-	//1711550,
-	$result=mysql_query($queryDoctors);
-	while($row=mysql_fetch_array($result)){
-		$find=';';
-		$textManipulate= new textManipulate;
-		$occurenceArray=$textManipulate->findOccurences($row[$attribute], $find);
-		if($occurenceArray!==FALSE){
-			$test=$textManipulate->separateOccurences($occurenceArray,$row[$attribute]);
-			$test=$textManipulate->parseRecords($test);	
+/*
+$getEducation="SELECT distinct name,count(id)from education where years !='' and name like '%johns%' group by name having count(id) > 1  order by count(id) desc,name, years";
+$educationResult=mysql_query($getEducation);
+while($educationRow=mysql_fetch_array($educationResult)){
+	$input=substr($educationRow['name'],0,15);
+	fuzzySearch($input,$words);
+}
+*/
+var_dump($words);
+foreach($words as $word){
+$getEducation="SELECT distinct name,count(id)from education where years !='' and name like '%".$word."%' group by name having count(id) > 1  order by count(id) desc,name, years";
+echo $getEducation."<BR>";
+$educationResult=mysql_query($getEducation);
+while($educationRow=mysql_fetch_array($educationResult)){
+	$input=substr($educationRow['name'],0,15);
+	//fuzzySearch($input,$words);
+}
+
+
+}
+// array of words to check against
+
+function fuzzySearch($input,$words){
+	// no shortest distance found, yet
+	$shortest = -1;
 	
-		}
-		else{
-			$test=array($row[$attribute]);
-			$test=$textManipulate->parseRecords($test);	
-			
+	// loop through words to find the closest
+	foreach ($words as $word) {
 	
-		}
-		$i=0;
-		
+	    // calculate the distance between the input word,
+	    // and the current word
+	    $lev = levenshtein($input, $word);
 	
-		for($i=0;$i<sizeof($test['name']);$i++){
-			switch($attribute){
-			case 'residency':
-				$test['type'][$i]=$attribute;
-			case 'fellowship':
-				$test['type'][$i]=$attribute;
-			}
-			$insertQuery="INSERT INTO ".$table." (atomId,type,name,years) VALUES ('". $row['atomId']."','". $test['type'][$i]."','". $test['name'][$i]."','". $test['date'][$i]."')";
-			echo $insertQuery."<BR>";
-			mysql_query($insertQuery);
-		}
-		//$test=$textManipulate->separateDegrees($test['string']);
-		//var_dump($test['date']);
+	    // check for an exact match
+	    if ($lev == 0) {
+	
+	        // closest word is this one (exact match)
+	        $closest = $word;
+	        $shortest = 0;
+	
+	        // break out of the loop; we've found an exact match
+	        break;
+	    }
+	
+	    // if this distance is less than the next found shortest
+	    // distance, OR if a next shortest word has not yet been found
+	    if ($lev <= $shortest || $shortest < 0) {
+	        // set the closest match, and shortest distance
+	        $closest  = $word;
+	        $shortest = $lev;
+	    }
 	}
+	
+	echo "Input word: $input\n";
+	if ($shortest == 0) {
+	    echo "Exact match found: $closest\n";
+	} else {
+	    echo "Did you mean: $closest? $shortest\n";
+	}
+	echo "<BR>";
 }
-	//$uids=$dataminer->eSearch($query,0);
-//if there are papers, insert an author record	
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs";
 
