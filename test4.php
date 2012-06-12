@@ -1,25 +1,16 @@
 <?php 
 include("lib/init.php");
-function
-$query="select * from edge where class=2";
-$result = mysql_query($query) or die(mysql_error());
-$sources=array();
-while($row=mysql_fetch_array($result)){
-	$test=edgeExists($row['source'],$row['target'],'edgeCache');
-	if($test>0){
-		$updateQuery="UPDATE edgeCache set weight=(weight+".$row['weight'].") where source=".$row['source']." AND target=".$row['target'];
-		mysql_query($updateQuery);
-	}
-	else{
-		$valueArray=array(
-			'source'=>$row['source'],
-			'target'=>$row['target'],
-			'weight'=>$row['weight'],
-		);
-		insertEdge($valueArray,'edgeCache');
-	
-	}
-}
+$start_date = '2009';
 
+$end_date = '2012';
+
+$date_from_user = '2007';
+
+//$test=check_in_range($start_date, $end_date, $date_from_user);
+//var_dump( $test);
+
+processDate('2009','md');
+$test=processDate('1979-Present','phd');	
+var_dump($test);
 
 ?>

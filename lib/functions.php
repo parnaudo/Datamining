@@ -7,6 +7,13 @@ function authorPubmedTransform($first,$middle,$last){
  	 $query = ''.ucfirst(strtolower($last))." ".$first.$middle. "[Author]";
  	 return $query;
 }
+function checkDateRange($startDate, $endDate, $dateFromUser){
+  echo "$startDate, $endDate, $dateFromUser<BR>";
+  $start_ts = strtotime($startDate);
+  $end_ts = strtotime($endDate);
+  $user_ts = strtotime($dateFromUser);
+  return (($user_ts >= $start_ts) && ($user_ts <= $end_ts));
+}
 function cleanDate($date){
 		
 		$length = strlen($date); 
@@ -116,6 +123,7 @@ function createTable($insertTable){
 	if($debug) echo "Database created";	
 	
 }
+
 function deduplicateAuthors(){
 	$atomQuery="select atomId from authors where atomId!=0 group by atomId having count(id) > 1 order by atomId ASC";
 	$result=mysql_query($atomQuery);
@@ -161,20 +169,19 @@ function deleteTable($insertTable){
 		mysql_query("DROP TABLE ".$insertTable."");
 		if($debug)echo "Database deleted!";
 } 
-
+function edgeExists($source,$target,$table){
+	$query="SELECT * from ".$table." WHERE class=3 AND source=".$source." AND target=".$target;
+	$result=mysql_query($query);
+	$existFlag=mysql_num_rows($result);
+	return $existFlag;
+}
 function getAtomId($authorId){
 	$query="SELECT atomId FROM authors where id=".$authorId;
 	$result=mysql_query($query);
 	$row=mysql_fetch_array($result);
 	return $row['atomId'];
 }
-function edgeExists($source,$target,$table){
-	$query="SELECT * from ".$table." WHERE source=".$source." AND target=".$target;
-	$result=mysql_query($query);
-	$existFlag=mysql_num_rows($result);
-	//echo $query." RESULTS IN ".$test." <BR>";
-	return $existFlag;
-}
+
 function getMostPopulatedMatters($threshold){
 	$matterArray=array();
 	
@@ -281,6 +288,51 @@ function percentile($data,$percentile){
     } 
     return $result; 
 } 
+function processDate($years,$type){
+	$change=0;
+	$findme='-';
+	$length=strlen($years);
+	$yearTest=stripos($years,$findme);
+	if($yearTest!==FALSE){
+	//two dates
+		$start=substr($years,0,$yearTest);
+		$end=substr($years,$yearTest+1,$length);
+		if(stripos($end,'present')!==FALSE){
+			$end=date('Y');
+		}
+		if(strlen($end)==2){
+			$prefix=substr($start,0,2);
+			$end=$prefix.$end;
+		}
+		$date=array('start'=>$start,'end'=>$end);
+		return $date;	
+
+	}
+	else{
+		if(stripos($type,'md')!==FALSE){
+			$change=3;
+		}
+		elseif(stripos($type,'fellowship')!==FALSE){
+			$change=2;
+		}
+		elseif(stripos($type,'phd')!==FALSE){
+			$change=5;
+		}
+		elseif(stripos($type,'residency')!==FALSE){
+			$change=5;
+		}
+		else{
+			$chage=3;
+		}					
+		$end=intval($years);
+		$start=$end-$change;
+		$date=array('start'=>$start,'end'=>$end);
+		return $date;
+	}
+
+
+}
+
 function relationshipToEdge($relationshipId){
 	$query="select n.id from node n INNER JOIN individual i ON i.id=n.infoId INNER JOIN authors a ON a.atomId=i.id  where a.id=".$relationshipId." and n.class=2;";
 	echo $query;

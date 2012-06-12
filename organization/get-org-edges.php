@@ -16,7 +16,6 @@ while($row=mysql_fetch_array($result)){
 	getOrgInfo($row['srcIsotopeId'],$row['dstAtomId'],$table);
 	$physicianResult=mysql_query($getPhysicians);
 	while($physicianRow=mysql_fetch_array($physicianResult)){
-		//echo $physicianRow['srcAtomId']."<BR>";
 		$source=$physicianRow['srcAtomId'];
 		$target=$row['dstAtomId'];
 		$valueArray=array(
@@ -25,13 +24,10 @@ while($row=mysql_fetch_array($result)){
 			'weight'=>'8.0',
 			'class'=>'1'
 		);
-		//insertQuery($valueArray,'edge');
+		insertQuery($valueArray,'edge');
 	}
 }
-		//	$updateQuery="UPDATE topneurologistsnetworkmeasures set firstName='".mysql_escape_string($firstName)."',lastName='".mysql_escape_string($lastName)."',middleName='".mysql_escape_string($middleName)."' where Id='".$row['id']."'";
-		//echo $updateQuery;
-		//mysql_query($updateQuery) or die ("Error in query: $query. ".mysql_error());
-		//if there are papers, insert an author record	
+
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs with rows: ".$count;
 
