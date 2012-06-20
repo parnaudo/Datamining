@@ -10,6 +10,18 @@ include("../lib/init.php");
 //updatePercentiles("topneurologistsnetworkmeasures","ClosenessCentrality","ClosenessPercentile");
 //updatePercentiles("topneurologistsnetworkmeasures","BetweennessCentrality","BetweennessPercentile");
 //updatePercentiles("topneurologistsnetworkmeasures","SCImagoProminenceScore","SCImagoProminenceScorePercentile");
+
+$scores=array('WeightedDegree','Degree','EigenvectorCentrality','ClosenessCentrality','BetweennessCentrality');
+
+$percentiles=array('WeightedDegreePercentile','DegreePercentile','EigenvectorCentralityPercentile','ClosenessCentralityPercentile','BetweennessCentralityPercentile');
+$tables=array('node','node','node','node','node');
+$table='node';
+
+for($i=0;$i < 5; $i++){
+	updatePercentiles($table, $scores[$i],$percentiles[$i]);
+	echo $scores[$i]." PERCENTILE ".$percentiles[$i]." TABLE ".$table."<BR>";	
+}
+
 updatePercentiles("topneurologistsnetworkmeasures","ClinicalTrialsCount","ClinicalTrialsPercentile");	
 function updatePercentiles($table,$field,$percentileField){
 	$query="SELECT count(".$field.") as totalCount from ".$table;

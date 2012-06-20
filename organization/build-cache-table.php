@@ -1,5 +1,5 @@
 <?php 
-include("lib/init.php");
+include("../lib/init.php");
 $Start = getTime(); 
 clearTable('edgeCache');
 $table="relationship";
