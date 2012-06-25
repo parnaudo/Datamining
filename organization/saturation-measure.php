@@ -24,8 +24,8 @@ $array6=array(1);
 $set=array($array1,$array2,$array3,$array4,$array5,$array6);
 
 //var_dump($set);
-$test=saturationNodes($test,10);
-var_dump($test);
+$test2=saturationNodes($test,3);
+var_dump($test2);
 function getNode($node,$table){
 //Get all targets for nodes in a bidirectional edge table, will be ordered in terms of outdegree
 	$filter="WHERE source=".$node;

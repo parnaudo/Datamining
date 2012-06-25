@@ -261,7 +261,7 @@ foreach($valueArray as $name=>$value){
 		$values[]=mysql_escape_string($value);
 	}
 	$insertQuery="INSERT INTO ".$table." (".implode(",",$variables).") VALUES ('".implode("','",$values)."')";
-	//echo $insertQuery."<BR>";
+	echo $insertQuery."<BR>";
 	mysql_query($insertQuery);
 }
 
