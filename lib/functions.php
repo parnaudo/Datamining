@@ -7,6 +7,15 @@ function authorPubmedTransform($first,$middle,$last){
  	 $query = ''.ucfirst(strtolower($last))." ".$first.$middle. "[Author]";
  	 return $query;
 }
+function certainty($count){
+	$selectQuery="SELECT certainty,id FROM edgeCache";
+	$result=mysql_query($selectQuery);
+	while($row=mysql_fetch_array($result)){
+		$certainty=$row['certainty']/$count;
+		$update="UPDATE edgeCache SET certainty=".$certainty." WHERE id=".$row['id'];
+		mysql_query($update);			
+	}
+}
 function checkDateRange($startDate, $endDate, $dateFromUser){
   echo "$startDate, $endDate, $dateFromUser<BR>";
   $start_ts = strtotime($startDate);
@@ -169,8 +178,15 @@ function deleteTable($insertTable){
 		mysql_query("DROP TABLE ".$insertTable."");
 		if($debug)echo "Database deleted!";
 } 
-function edgeExists($source,$target,$table){
-	$query="SELECT * from ".$table." WHERE class=3 AND source=".$source." AND target=".$target;
+function edgeExists($source,$target,$table,$class){
+	if(empty($class)){
+		$filter='';
+	}
+	else{
+		$filter=" AND class=".$class;
+	}
+	$query="SELECT * from ".$table." WHERE  source=".$source." AND target=".$target.$filter;
+	echo $query;
 	$result=mysql_query($query);
 	$existFlag=mysql_num_rows($result);
 	return $existFlag;
@@ -200,32 +216,44 @@ return $matterArray;
 }
 function getOrgInfo($isotopeId,$atomId,$table){
 	$orgArray=array(
+		'isotopeId'=>$isotopeId,
+		'atomId'=>$atomId,
 		'institution'=>'',
 		'city'=>'',
-		'state'=>''
+		'state'=>'',
+		'zipcode'=>''
 	);
 	$getOrgValues="SELECT name,value from particles p INNER JOIN matters m ON m.matterId=p.matterId WHERE isotopeId=".$isotopeId;
 	echo $getOrgValues;
 	$orgResult=mysql_query($getOrgValues);
 	while($orgRow=mysql_fetch_array($orgResult)){
-		if(stripos($orgRow['name'],'institution')!==FALSE && stripos($orgRow['name'],'multi')===FALSE && stripos($orgRow['name'],'NPI')===FALSE){
-			echo $orgRow['name']. ": ".$orgRow['value']."<BR>";
-			$orgArray['institution']=$orgRow['value'];
-		}
-		if($orgRow['name']==='City'){
-			$orgArray['city']=$orgRow['value'];		
-			echo $orgRow['name']. ": ".$orgRow['value']."<BR>";		
-		}
-		if($orgRow['name']==='State'){
-			$orgArray['state']=$orgRow['value'];			
-			echo $orgRow['name']. ": ".$orgRow['value']."<BR>";		
+		if(!empty($orgRow['value'])){
+			if(stripos($orgRow['name'],'institution')!==FALSE && stripos($orgRow['name'],'multi')===FALSE && stripos($orgRow['name'],'NPI')===FALSE && stripos($orgRow['name'],'institution2')===FALSE){
+				echo $orgRow['name']. ": ".$orgRow['value']."<BR>";
+				$orgArray['institution']=$orgRow['value'];
+			}
+			if($orgRow['name']==='City'){
+				$orgArray['city']=$orgRow['value'];		
+				echo $orgRow['name']. ": ".$orgRow['value']."<BR>";		
+			}
+			if($orgRow['name']==='State'){
+				$orgArray['state']=$orgRow['value'];			
+				echo $orgRow['name']. ": ".$orgRow['value']."<BR>";		
+			}
+			if(stripos($orgRow['name'],'zipcode')!==FALSE){
+				$orgArray['zipcode']=$orgRow['value'];			
+				echo $orgRow['name']. ": ".$orgRow['value']."<BR>";		
+			}
 		}
 	}
-	$insertQuery="INSERT INTO ".$table." (isotopeId,institution,city,state,atomId) VALUES ('".$isotopeId."','".mysql_escape_string($orgArray['institution'])."','".mysql_escape_string($orgArray['city'])."','".mysql_escape_string($orgArray['state'])."','".$atomId."')";
-	mysql_query($insertQuery);
+	insertQuery($orgArray,$table);
 
 }
-
+function getRowCount($query){
+	$queryResult=mysql_query($query);
+	$count=mysql_num_rows($queryResult);
+	return $count;
+}
 function getTime() 
     { 
     $a = explode (' ',microtime()); 
@@ -390,10 +418,10 @@ function transferAuthorEdges($table){
 			'source'=>$source,
 			'target'=>$target,
 			'weight'=>$weight,
-			'direction'=>'Undirected',
+			'direction'=>'Directed',
 			'class'=>2
 		);	
-		insertEdge($valueArray);
+		insertQuery($valueArray,'edge');
 	}
 
 }

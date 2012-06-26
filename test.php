@@ -21,6 +21,11 @@ class edgeCreate {
 				$base=4;
 				$class=5;
 				break;
+			case 'mixed':
+				$filter=" AND (type LIKE 'residency' or type LIKE 'fellowship' or type like 'phd%')";
+				$base=1;
+				$class=7;
+				break;
 			default:
 				$filter=" AND type NOT LIKE 'residency' AND type NOT LIKE 'fellowship' and type NOT LIKE 'md'";
 				$base=1;
@@ -28,18 +33,23 @@ class edgeCreate {
 				break;
 			}
 		 
-		$atomQuery="SELECT * from education where  years!=''$filter";
+		$atomQuery="select * from education where years!=''$filter";
 		$result=mysql_query($atomQuery);
 		while($row=mysql_fetch_array($result)){
+			$mixedFilter='';
 			$source=$row['atomId'];
 			$referenceDate=processDate($row['years'],$row['type']);
 			var_dump($referenceDate);
-			$edgeQuery="SELECT * from education where name like '".$row['name']."' AND atomId!=".$row['atomId']." AND years!=''$filter";
+			if($class==7){
+				$mixedFilter=" AND type!='".$row['type']."'";
+			}
+			$edgeQuery="SELECT * from education where name like '".mysql_escape_string($row['name'])."' AND atomId!=".$row['atomId']." AND years!=''$filter $mixedFilter";
 			$edgeResult=mysql_query($edgeQuery);
 			echo $edgeQuery."<BR>";
 			$rowTest=mysql_num_rows($edgeResult);
 			if($rowTest > 1){
 				while($edgeRow=mysql_fetch_array($edgeResult)){
+					$existTest=0;
 					$valueArray1=array();
 					$valueArray2=array();
 					$target=$edgeRow['atomId'];
@@ -56,7 +66,7 @@ class edgeCreate {
 						}
 					
 					}
-					$existTest=edgeExists($source,$target,$table);
+					$existTest=edgeExists($source,$target,$table,$class);
 					if($existTest < 1 && $weight > 0){
 						
 						$valueArray1=array(
@@ -77,12 +87,14 @@ class edgeCreate {
 						insertQuery($valueArray2,$table);
 					}
 					elseif($existTest > 0 && $weight > 0){
-						$updateQuery="UPDATE ".$table." set weight=(weight+".$weight.") where source=".$source." AND target=".$target." AND class=3";
+						$updateQuery="UPDATE ".$table." set weight=(weight+".$weight.") where source=".$source." AND target=".$target." AND class=".$class;
 						echo $updateQuery;
 						mysql_query($updateQuery);
-						$updateQuery="UPDATE ".$table." set weight=(weight+".$weight.") where source=".$target." AND target=".$source." AND class=3";
+						$updateQuery="UPDATE ".$table." set weight=(weight+".$weight.") where source=".$target." AND target=".$source." AND class=".$class;
+						echo $updateQuery;
 						mysql_query($updateQuery);
-	
+		
+					
 					
 					}
 					else{
@@ -101,11 +113,11 @@ class edgeCreate {
 
 }
 
-$type=array('residency','fellowship','md','');
+$type=array('md','residency','fellowship','other','mixed');
 $edges=new edgeCreate;
 foreach($type as $value){
 	$edges->education($value);
 }
 $dataminer=new dataMiner;
-
+echo "ALL DONE";
 ?>

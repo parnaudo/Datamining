@@ -33,7 +33,6 @@ while($row=mysql_fetch_array($result)){
 	$numAuthors=$row['numAuthors'];
 	$authorPosition=$row['authorPosition'];
 	$getInstances="SELECT coAuthor, coAuthorPosition,query,duplicateFlag FROM coAuthorInstance inner join authors on coAuthorInstance.coAuthor=authors.id where paper='".$paper."' AND coAuthorPosition!='".$authorPosition."' ";
-	echo $getInstances."<BR>";
 	$instanceResult=mysql_query($getInstances);
 //GET all distinct coauthor information for each author id and paper
 	while($rowInstance=mysql_fetch_array($instanceResult)){
@@ -73,7 +72,7 @@ while($row=mysql_fetch_array($result)){
 
 
 }
-transferAuthorEdges('edge');				
+transferAuthorEdges('relationship');				
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." seconds";
 ?>
