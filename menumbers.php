@@ -14,11 +14,11 @@ function linkMEnumber($table){
 	// Print out the contents of each row into a table 
 	while($row = mysql_fetch_array($result)){
 		if($row['atomId'] !=0 && $row['value']!=''){
-			$getMedschool="select particles.value FROM particles INNER JOIN matters ON matters.matterID=particles.matterID WHERE matters.matterId IN (2917,5149,5681,3761,549,2399,2472)' AND particles.atomID=".$row['atomId']." AND particles.value!=''";
+			$getMedschool="select particles.value FROM particles INNER JOIN matters ON matters.matterID=particles.matterID WHERE matters.matterId IN (2917,5149,5681,3761,549,2399,2472) AND particles.atomID=".$row['atomId']." AND particles.value!=''";
 			$medschoolResult = mysql_query($getMedschool) or die(mysql_error());
 			$rowMedschool = mysql_fetch_array($medschoolResult);
 			if($rowMedschool['value']!=''){
-				$schoolID=substr($row['value'],0,4);
+				$schoolID=substr($row['value'],0,5);
 				
 				if(in_array($rowMedschool['value'],$MEinfo)){
 					echo $rowMedschool['value']. " Already in array";
@@ -41,7 +41,7 @@ function linkMEnumber($table){
 	echo $numRows. " results with ".$count." medical education number hits";
 }
 clearTable($table);
-createMETable($table);
+//createMETable($table);
 linkMEnumber($table);
 
 //looking to make menumbers associated with medschools

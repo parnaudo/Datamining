@@ -69,49 +69,7 @@ function clearAuthorTables(){
 function clearTable($insertTable){
 		mysql_query("DELETE FROM ".$insertTable."");
 } 
-function createInstanceTable($insertTable){
-	
-	$createTable="CREATE TABLE `".$insertTable."` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `atomId` int(11) DEFAULT NULL,
-  `name` varchar(100) DEFAULT NULL,
-  `position` varchar(50) DEFAULT NULL,
-  `tenurefrom` int(11) DEFAULT NULL,
-  `tenureto` int(11) DEFAULT NULL,
-  `type` varchar(20) DEFAULT NULL,
-  `isotopeId` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=142916 DEFAULT CHARSET=latin1";
 
-
-	mysql_query($createTable)or die(mysql_error());
-}
-function createAttributesTable($insertTable){
-	
-	$createTable="CREATE TABLE `".$insertTable."` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `atomId` int(11) DEFAULT NULL,
-  `firstName` varchar(20) DEFAULT NULL,
-  `middleName` varchar(20) DEFAULT NULL,
-  `lastName` varchar(20) DEFAULT NULL,
-  `zipcode` varchar(20) DEFAULT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `medschool` varchar(50) DEFAULT NULL,
-  `medschoolyear` int(11) DEFAULT NULL,
-  `internship` varchar(50) DEFAULT NULL,
-  `internshipyear` int(11) DEFAULT NULL,
-  `residency` varchar(50) DEFAULT NULL,
-  `residencyyear` int(11) DEFAULT NULL,
-  `fellowship` varchar(50) DEFAULT NULL,
-  `menumber` varchar(11) DEFAULT NULL,
-  `fellowshipyear` int(11) DEFAULT NULL,
-  `specialty` varchar(100) DEFAULT NULL,
-  `hospital` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4279 DEFAULT CHARSET=latin1;
-";
-	mysql_query($createTable)or die(mysql_error());
-}
 function createMETable($insertTable){
 	
 	$createTable="CREATE TABLE `".$insertTable."` (

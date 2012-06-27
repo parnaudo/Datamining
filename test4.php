@@ -5,7 +5,7 @@ include("lib/init.php");
 $Start = getTime(); 
 
 //clearTable('edgeCache');
-$table="schizo";
+$table="nodepruned";
 $dataminer=new dataMiner;
 $query="SELECT zipcode,atomId from ".$table;
 $result = mysql_query($query) or die(mysql_error());
@@ -13,6 +13,8 @@ while($row=mysql_fetch_array($result)){
 	$name=substr($row['zipcode'],0,5);
 	if(strlen($name) < 5){
 		$name=str_pad($name,5,0,STR_PAD_LEFT); 
+		$updateQuery="UPDATE ".$table." SET zipcode='".$name."' where atomId=".$row['atomId'];
+		mysql_query($updateQuery);
 	}
 	$selectCoords="SELECT latitude,longitude from zipcodes where zipCodeValue=".$name." LIMIT 1";
 	$resultCoords = mysql_query($selectCoords) or die(mysql_error());

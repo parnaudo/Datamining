@@ -2,7 +2,7 @@
 include("../lib/init.php");
 $Start = getTime(); 
 $table="education";
-$attribute=array('residency','fellowship','medschool');
+$attribute=array('medschool');
 
 clearTable($table);
 foreach($attribute as $attribute){
@@ -22,7 +22,6 @@ function extractEducation($attribute,$table){
 		if($occurenceArray!==FALSE){
 			$test=$textManipulate->separateOccurences($occurenceArray,$row[$attribute]);
 			$test=$textManipulate->parseRecords($test);	
-	
 		}
 		else{
 			$test=array($row[$attribute]);

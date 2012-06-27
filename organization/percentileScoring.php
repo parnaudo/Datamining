@@ -6,11 +6,24 @@ This script creates an address rank based on the number of instances they have i
 Written by Paul Arnaudo 3/29/12 
 */
 include("../lib/init.php");
-//updatePercentiles("topneurologistsnetworkmeasures","paperCount","PaperCountPercentile");
-//updatePercentiles("topneurologistsnetworkmeasures","ClosenessCentrality","ClosenessPercentile");
-//updatePercentiles("topneurologistsnetworkmeasures","BetweennessCentrality","BetweennessPercentile");
-//updatePercentiles("topneurologistsnetworkmeasures","SCImagoProminenceScore","SCImagoProminenceScorePercentile");
-updatePercentiles("topneurologistsnetworkmeasures","ClinicalTrialsCount","ClinicalTrialsPercentile");	
+$table='nodepruned2';
+$sql = "select column_name from information_schema.columns where table_name='".$table."'";
+$result=mysql_query($sql);
+while($row=mysql_fetch_array($result)){
+	
+	echo stripos($row['column_name'],'Id');
+	if(stripos($row['column_name'],'Id')!==0 && stripos($row['column_name'],'Label')!==0 ){
+		$column=$row['column_name']."Percentile";
+		$alterTable="ALTER TABLE ".$table." ADD ".$column." FLOAT(10)";
+		echo $alterTable."<BR>";
+		mysql_query($alterTable);
+		updatePercentiles($table,$row['column_name'],$column);
+	}
+}
+/*updatePercentiles("topneurologistsnetworkmeasures","paperCount","PaperCountPercentile");
+updatePercentiles("topneurologistsnetworkmeasures","ClosenessCentrality","ClosenessPercentile");
+updatePercentiles("topneurologistsnetworkmeasures","BetweennessCentrality","BetweennessPercentile");
+updatePercentiles("topneurologistsnetworkmeasures","SCImagoProminenceScore","SCImagoProminenceScorePercentile");*/
 function updatePercentiles($table,$field,$percentileField){
 	$query="SELECT count(".$field.") as totalCount from ".$table;
 	$query=mysql_query($query);
