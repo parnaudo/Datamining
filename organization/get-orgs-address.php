@@ -1,37 +1,54 @@
 <?php 
 include("../lib/init.php");
 $Start = getTime(); 
+$table='orgTemp';
 $dataminer=new dataMiner;
-$queryOrgs = "select address,city,state,zip, count(id) as count from neurologist where paperCount>2 and (middleName!='' OR paperCountFullAuthor > 1) group by address order by count desc ";
-$table='organization';
+
 clearTable($table);
-$table2='node';
-clearTable($table2);
-$nodeCount=0;
-//$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
-$result = mysql_query($queryOrgs) or die(mysql_error());
+//Right now this is limited to organizations that have more than one record from the set, can change whenever though.
+$queryDoctors = "select distinct institution from nodepruned order by institution";
+//echo $queryDoctors;
+$result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
-	$nodeCount++;
-	$insertQuery="INSERT INTO ".$table." (id,address,city,state,zipcode) VALUES ('".$nodeCount."','".mysql_escape_string($row['address'])."','".mysql_escape_string($row['city'])."','".mysql_escape_string($row['state'])."','".mysql_escape_string($row['zipcode'])."')";	
-	mysql_query($insertQuery);
-	$insertNodeQuery="INSERT INTO ".$table2." (class,infoId) VALUES ('1','".$nodeCount."')";
-	mysql_query($insertNodeQuery);
-	
-		//	$updateQuery="UPDATE topneurologistsnetworkmeasures set firstName='".mysql_escape_string($firstName)."',lastName='".mysql_escape_string($lastName)."',middleName='".mysql_escape_string($middleName)."' where Id='".$row['id']."'";
-		//echo $updateQuery;
-		//mysql_query($updateQuery) or die ("Error in query: $query. ".mysql_error());
+	//$nodeCount++;
+	$getPhysicians="SELECT distinct atomId from nodepruned where institution='".$row['institution']. "'";
+//find org info and add an entity to the organization table
+	//echo $getPhysicians."<BR>";
+	//getOrgInfo($row['srcIsotopeId'],$row['dstAtomId'],$table);
+	$physicianResult=mysql_query($getPhysicians);
+	$nodes=array();
+	while($physicianRow=mysql_fetch_array($physicianResult)){
+		$nodes[]=$physicianRow['atomId'];
+		
+
+		//$source=$physicianRow['srcAtomId'];
+		//$target=$row['dstAtomId'];
+		/*$valueArray=array(
+			'source'=>$source,
+			'target'=>$target,
+			'weight'=>'8.0',
+			'class'=>'1'
+		);*/
+		//insertQuery($valueArray,'edge');
+	}
+	for($i=0;$i < sizeof($nodes);$i++){
+		for($k=0;$k <sizeof($nodes);$k++){
+			if($i!==$k){
+				$valueArray=array(
+						'source'=>$nodes[$i],
+						'target'=>$nodes[$k],
+						'weight'=>8,
+						'direction'=>'Directed',
+						'class'=>1
+					);
+				insertQuery($valueArray,'edge');			
+			}
+		}
+	}
+
+	var_dump($nodes);
 }
 
-$queryDoctors = "select * from neurologist where paperCount>2 and (middleName!='' OR paperCountFullAuthor > 1)";
-$resultDoctors = mysql_query($queryDoctors) or die(mysql_error());
-while($rowDoctors=mysql_fetch_array($resultDoctors)){
-	$nodeCount++;
-	$insertNodeQuery="INSERT INTO ".$table2." (class,infoId) VALUES (2,'".$rowDoctors['id']."')";	
-	echo $insertNodeQuery."<BR>";
-	mysql_query($insertNodeQuery);		
-}
-//if there are papers, insert an author record	
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs with rows: ".$count;
-
 ?>

@@ -5,7 +5,7 @@ $table="edgeCache";
 clearTable($table);
 
 $dataminer=new dataMiner;
-$query="SELECT distinct target from edge where class=1";
+/*$query="SELECT distinct target from edge where class=1";
 $result = mysql_query($query) or die(mysql_error());
 $sources=array();
 $updateCount=0;
@@ -39,9 +39,9 @@ while($row=mysql_fetch_array($result)){
 		}
 		}
 	
-}
+}*/
 //Get the rest of the edges and add them up.
-$query="select * from edge where class>1";
+$query="select * from edge ";
 $result = mysql_query($query) or die(mysql_error());
 $sources=array();
 while($row=mysql_fetch_array($result)){
@@ -68,7 +68,7 @@ while($row=mysql_fetch_array($result)){
 $edgeTypes="SELECT DISTINCT class FROM edge";
 $edgeCount=getRowCount($edgeTypes);
 //create certainty measure
-//certainty($edgeCount);
+certainty($edgeCount);
 
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs with $updateCount updates";

@@ -1,12 +1,5 @@
 <?php
-	Class education{
-		function getYear( ){
-				
-		}
-		function getName(){
-		
-		}
-	}
+
 	Class textManipulate{
 //basically this is strpos for more than one occurence	
 		function findOccurences($string, $find) {

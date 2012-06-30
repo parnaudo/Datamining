@@ -1,79 +1,80 @@
 <?php 
 include("lib/init.php");
-$Start = getTime(); 
-$table="education";
-$attribute=array('residency','fellowship','medschool');
+	Class networkAnalysis{
 
-$words  = array();
-$getEducation="SELECT distinct name,count(id)from education where years !='' group by name having count(id) > 1  order by count(id) desc,name, years";
-$educationResult=mysql_query($getEducation);
-$educationRow=mysql_fetch_array($educationResult);
-while($educationRow=mysql_fetch_array($educationResult)){
-	$break=strpos($educationRow['name'],' ');
-	$words[]=substr($educationRow['name'],0,$break);
-}
-/*
-$getEducation="SELECT distinct name,count(id)from education where years !='' and name like '%johns%' group by name having count(id) > 1  order by count(id) desc,name, years";
-$educationResult=mysql_query($getEducation);
-while($educationRow=mysql_fetch_array($educationResult)){
-	$input=substr($educationRow['name'],0,15);
-	fuzzySearch($input,$words);
-}
-*/
-var_dump($words);
-foreach($words as $word){
-$getEducation="SELECT distinct name,count(id)from education where years !='' and name like '%".$word."%' group by name having count(id) > 1  order by count(id) desc,name, years";
-echo $getEducation."<BR>";
-$educationResult=mysql_query($getEducation);
-while($educationRow=mysql_fetch_array($educationResult)){
-	$input=substr($educationRow['name'],0,15);
-	//fuzzySearch($input,$words);
-}
-
-
-}
-// array of words to check against
-
-function fuzzySearch($input,$words){
-	// no shortest distance found, yet
-	$shortest = -1;
-	
-	// loop through words to find the closest
-	foreach ($words as $word) {
-	
-	    // calculate the distance between the input word,
-	    // and the current word
-	    $lev = levenshtein($input, $word);
-	
-	    // check for an exact match
-	    if ($lev == 0) {
-	
-	        // closest word is this one (exact match)
-	        $closest = $word;
-	        $shortest = 0;
-	
-	        // break out of the loop; we've found an exact match
-	        break;
+		public $node;
+		public $table;
+		public $threshold;
+	    function __construct($x,$y,$z){
+	    	$this->node=$x;
+	    	$this->table=$y;
+	    	$this->threshold=$z; 
 	    }
-	
-	    // if this distance is less than the next found shortest
-	    // distance, OR if a next shortest word has not yet been found
-	    if ($lev <= $shortest || $shortest < 0) {
-	        // set the closest match, and shortest distance
-	        $closest  = $word;
-	        $shortest = $lev;
-	    }
-	}
-	
-	echo "Input word: $input\n";
-	if ($shortest == 0) {
-	    echo "Exact match found: $closest\n";
-	} else {
-	    echo "Did you mean: $closest? $shortest\n";
-	}
-	echo "<BR>";
-}
-$End = getTime(); 
-echo "Time taken = ".number_format(($End - $Start),2)." secs";
+	    
+		function reach(){
+			$nodeArray=array();
+			$firstTargets=$this->getTargets();
+			$reach=0;
+			$origin=$this->node;
+			for($i=0;$i < sizeof($firstTargets);$i++){
+				$test=in_array($firstTargets['id'][$i],$nodeArray);
+				if(in_array($firstTargets['id'][$i],$nodeArray)===FALSE){
+					$nodeArray[]=$firstTargets['id'][$i];
+				}
+				$reach=$reach+($firstTargets['weight'][$i]*.5);
 
+	
+				$this->node=$firstTargets['id'][$i];
+				$secondTargets=$this->getTargets();
+				for($j=0;$j < sizeof($secondTargets);$j++){
+					if(in_array($secondTargets['id'][$j],$nodeArray)===FALSE){
+						$nodeArray[]=$secondTargets['id'][$j];
+					}
+					if($secondTargets['id'][$j]==$origin){
+						
+					}
+					else{
+						$reach=$reach+($secondTargets['weight'][$j]*.25);	
+					}
+				}
+				
+			}
+			//print_r($nodeArray);
+			return $reach;
+
+						
+				
+							
+				
+		}
+		function getTargets(){
+			$targets=array();
+			$weights=array();
+			$returnArray=array();
+			$select="SELECT target,weight from ".$this->table." where source=".$this->node." AND weight > ".$this->threshold;
+			$result=mysql_query($select);
+			while($row=mysql_fetch_array($result)){
+				$targets[]=$row['target'];
+				$weights[]=$row['weight'];
+			}
+			$returnArray['id']=$targets;
+			$returnArray['weight']=$weights;
+			return $returnArray;	
+		}
+	}
+	$node=1712046;
+	$threshold=7.99;
+	$table='edgeCache';
+	$select="SELECT atomId FROM nodepruned";
+	$result=mysql_query($select);
+	while($row=mysql_fetch_array($result)){
+			$test=new networkAnalysis($row['atomId'],$table,$threshold);
+			$testTargets=$test->reach();
+			$updateQuery="UPDATE nodepruned SET reach='".$testTargets."' WHERE atomId=".$row['atomId'];
+			echo $updateQuery;
+			mysql_query($updateQuery);
+	}
+	$test=new networkAnalysis($node,$table,$threshold);
+	$testTargets=$test->reach();
+	var_dump($testTargets);
 ?>

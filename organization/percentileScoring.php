@@ -6,8 +6,8 @@ This script creates an address rank based on the number of instances they have i
 Written by Paul Arnaudo 3/29/12 
 */
 include("../lib/init.php");
-$table='nodepruned2';
-$sql = "select column_name from information_schema.columns where table_name='".$table."'";
+$table='nodepruned';
+$sql = "select column_name from information_schema.columns where table_name='".$table."' and column_name='reach'";
 $result=mysql_query($sql);
 while($row=mysql_fetch_array($result)){
 	
@@ -29,7 +29,8 @@ function updatePercentiles($table,$field,$percentileField){
 	$query=mysql_query($query);
 	$row=mysql_fetch_array($query);
 	$totalCount=$row['totalCount'];
-	$query="SELECT Id,".$field." FROM ".$table;
+	$query="SELECT atomId,".$field." FROM ".$table;
+	echo $query;
 	$result=mysql_query($query);
 	while($row=mysql_fetch_array($result)){
 	
@@ -37,7 +38,7 @@ function updatePercentiles($table,$field,$percentileField){
 		$result2=mysql_query($getCounts);
 		$row2=mysql_fetch_array($result2);
 		$percentile=$row2['lowCount']/$totalCount;
-		$updateQuery="UPDATE ".$table." set ".$percentileField."=".$percentile." WHERE Id=".$row['Id'];
+		$updateQuery="UPDATE ".$table." set ".$percentileField."=".$percentile." WHERE atomId=".$row['atomId'];
 		echo $updateQuery."<BR>";
 		mysql_query($updateQuery);
 	}
