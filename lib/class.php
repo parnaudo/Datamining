@@ -40,11 +40,7 @@
 			}
 
 			//print_r($nodeArray);
-			return $reach;
-
-						
-				
-							
+			return $reach;					
 				
 		}
 		function getTargets(){
