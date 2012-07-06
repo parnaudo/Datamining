@@ -274,6 +274,12 @@ function percentile($data,$percentile){
     } 
     return $result; 
 } 
+function multineedleStripos($haystack, $needles, $offset=0) {
+    foreach($needles as $needle) {
+        $found[$needle] = stripos($haystack, $needle, $offset);
+    }
+    return $found;
+}
 function processDate($years,$type){
 	$change=0;
 	$findme='-';

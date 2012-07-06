@@ -1,9 +1,6 @@
 <?php
 	Class networkAnalysis{
 
-		public $node;
-		public $table;
-		public $threshold;
 	    function __construct($x,$y,$z){
 	    	$this->node=$x;
 	    	$this->table=$y;
