@@ -331,15 +331,22 @@
 					
 	  	  		 	$paperInfo=array(
 						'affiliation'=> $result[0]->Article->Affiliation,
-						//'abstract'=> $result[0]->Article->Abstract->AbstractText,
+						'abstract'=> $result[0]->Article->Abstract,
 						'ISSN'=>str_replace('-',"",$result[0]->Article->Journal->ISSN),
 						'journal'=>$result[0]->Article->Journal->Title,
+						'journalCountry'=>$result[0]->MedlineJournalInfo->Country,
+						'volume'=>$result[0]->Article->Journal->JournalIssue->Volume,
+						'issue'=>$result[0]->Article->Journal->JournalIssue->Issue,
+						'pages'=>$result[0]->Article->Pagination->MedlinePgn,
+						'articleID'=>$result[0]->PubMedData->ArticleIdList->ArticleId,
 						'pubDate'=>$date,
+						'language'=>$result[0]->Article->Language,
 						'title'=>$result[0]->Article->ArticleTitle,
 						'authors'=>$result[0]->Article->AuthorList,
 						'lastAuthor'=>$lastAuthor,
 						'pubType'=>$result[0]->Article->PublicationTypeList,
 						'authorCount'=>$authorCount,
+						
 				);
 			}
 							

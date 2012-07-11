@@ -37,7 +37,7 @@ function updatePercentiles($table,$field,$percentileField){
 		$getCounts="SELECT count(".$field.") as lowCount from  ".$table." where ".$field." < ".$row[$field];
 		$result2=mysql_query($getCounts);
 		$row2=mysql_fetch_array($result2);
-		$percentile=$row2['lowCount']/$totalCount;
+		$percentile=($row2['lowCount']/$totalCount)*100;
 		$updateQuery="UPDATE ".$table." set ".$percentileField."=".$percentile." WHERE atomId=".$row['atomId'];
 		echo $updateQuery."<BR>";
 		mysql_query($updateQuery);
