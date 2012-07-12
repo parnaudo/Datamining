@@ -14,12 +14,12 @@ Written by Paul Arnaudo 3/10/12
 
 $Start = getTime(); 
 //remove old data from tables
-clearAuthorTables();
+//clearAuthorTables();
 $authorID=1;
 $filter="(MULTIPLE SCLEROSIS [MESH FIELDS] OR MULTIPLE SCLEROSIS [Title] OR MULTIPLE SCLEROSIS [Journal])";
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
 //$queryDoctors = "select * from neurologist where id IN (1760442420)";
-$queryDoctors = "select * from neurologist where paperCount>2 and (middleName!='' OR paperCountFullAuthor > 1)";
+$queryDoctors = "select distinct atomId,firstName,middleName,lastName from ocre where lastName > 'Paul' order by lastName";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   	$query=array();
@@ -58,7 +58,7 @@ while($row=mysql_fetch_array($result)){
 				  $author=str_replace('[Author]',"",$author);
 				  if(stripos($author,$pubmedName)===0 || stripos($pubmedName, $author)===0){
 				 	 $physicianQuery=$author;	
-					 $atomId=$row['id'];
+					 $atomId=$row['atomId'];
 					 $authorMatch=1;
 				  }	
 				   echo $author." VS ".$pubmedName." ".$authorMatch."<BR>";			  
@@ -72,7 +72,7 @@ while($row=mysql_fetch_array($result)){
 				  if($dupeTest > 0 ){
 						  $authorRow=mysql_fetch_array($resultAuthor);
 						  $coAuthor=$authorRow['id'];
-						  $atomId=$row['id'];
+						  $atomId=$row['atomId'];
 						  
 						  //echo $author." already in authors<br>";
 				  }
@@ -90,14 +90,14 @@ while($row=mysql_fetch_array($result)){
 					 }
 					$updateAuthorQuery="UPDATE authors set  atomId='".$atomId."' WHERE id='".$coAuthor."'";
 					mysql_query($updateAuthorQuery)  or die ("Error in query: $query. ".mysql_error());  		
-					$insertCoAuthorInstance = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$coAuthor."','".$paperID."','".$countAuthors."','".$row['id']."','".mysql_escape_string($author)."')";
+					$insertCoAuthorInstance = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$coAuthor."','".$paperID."','".$countAuthors."','".$row['atomId']."','".mysql_escape_string($author)."')";
 				  	mysql_query($insertCoAuthorInstance)  or die ("Error in query: $query. ".mysql_error());		
 				  	
 				  }
 				  elseif($paperFlag < 1){
 
 
-				  	$insertCoAuthorInstance = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$coAuthor."','".$paperID."','".$countAuthors."','".$row['id']."','".mysql_escape_string($physicianQuery)."')";
+				  	$insertCoAuthorInstance = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$coAuthor."','".$paperID."','".$countAuthors."','".$row['atomId']."','".mysql_escape_string($physicianQuery)."')";
 				  	mysql_query($insertCoAuthorInstance)  or die ("Error in query: $query. ".mysql_error());					
 
 				  }

@@ -2,7 +2,7 @@
 include("../lib/init.php");
 $Start = getTime(); 
 $table="education";
-$attribute=array('medschool');
+$attribute=array('fellowship','residency','medschool');
 
 clearTable($table);
 foreach($attribute as $attribute){
@@ -17,21 +17,22 @@ function extractEducation($attribute,$table){
 	$result=mysql_query($queryDoctors);
 	while($row=mysql_fetch_array($result)){
 		$find=';';
+		$test=mb_split($find,$row[$attribute]);
+		//var_dump($test);
 		$textManipulate= new textManipulate;
-		$occurenceArray=$textManipulate->findOccurences($row[$attribute], $find);
-		if($occurenceArray!==FALSE){
-			$test=$textManipulate->separateOccurences($occurenceArray,$row[$attribute]);
+		//$occurenceArray=$textManipulate->findOccurences($row[$attribute], $find);
+		//This data set has different education occurences split by ';' this splits them up and returns an array
+		if($test!==FALSE){
+			//$test=$textManipulate->separateOccurences($occurenceArray,$row[$attribute]);
 			$test=$textManipulate->parseRecords($test);	
 		}
 		else{
 			$test=array($row[$attribute]);
 			$test=$textManipulate->parseRecords($test);	
-			
-	
 		}
 		$i=0;
 		
-	
+
 		for($i=0;$i<sizeof($test['name']);$i++){
 			switch($attribute){
 			case 'residency':

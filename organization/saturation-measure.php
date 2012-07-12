@@ -1,7 +1,7 @@
 <?php 
 include("../lib/init.php");
 $Start = getTime(); 
-$table="edge";
+$table="edgeCache";
 $dataminer=new dataMiner;
 $queryNodes = "select distinct source, count(target) as degree from ".$table." group by source order by degree desc;";
 //$queryDoctors = "select * from neurologist where paperCount>10 and paperCountFullAuthor>6 order by paperCount Desc";
@@ -59,7 +59,7 @@ also accepts the number of nodes the user is looking to find.
 		$newSet=arrayCompare($compareArray,$indexArray);	
 		$compareArray[]=$newSet['bestSet'];
 		$bestNodes=is_array($bestNodes) && is_array($newSet['bestIndex']) ? array_unique(array_merge($bestNodes,$newSet['bestIndex'])) : $bestNodes;
-//take best set
+//take best set 
 		$q++;
 	}
 	return $bestNodes;
@@ -94,10 +94,6 @@ function arrayCompare($set,$index){
 //return the best index found in the set along with the best set which can be used to process total amount of coverage later
 	return $return;
 }
-
-
-
-
 
 $End = getTime(); 
 echo "Time taken = ".number_format(($End - $Start),2)." secs";
