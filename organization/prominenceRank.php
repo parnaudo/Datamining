@@ -9,8 +9,11 @@ include("../lib/init.php");
 
 $mysql = new mysql($connection);
 
-$physicians = "select distinct paper, coAuthorPosition,numAuthors,topneurologistsnetworkmeasures.id, SJR from coauthorinstance INNER JOIN papers on papers.id=paper  INNER JOIN topneurologistsnetworkmeasures on coauthorinstance.coAuthor=topneurologistsnetworkmeasures.id 
-LEFT JOIN journal ON (journal.ISSN=papers.ISSN OR journal.Title=papers.journal)";
+$physicians = "select distinct paper,coauthorposition,numAuthors,a.id,n.atomId,SJR from nodes n INNER JOIN authors a on a.atomId=n.AtomId
+INNER JOIN coauthorinstance c on c.coAuthor=a.id 
+INNER JOIN papers p on p.id=c.paper
+LEFT JOIN journal  j ON (j.ISSN=p.ISSN OR j.Title=p.journal)
+ where n.atomId=3814968";
 $result=mysql_query($physicians);
 while($row=mysql_fetch_array($result)){
 	$updateQuery='';
@@ -42,7 +45,7 @@ while($row=mysql_fetch_array($result)){
 		$journalRank=$row['SJR'];
 		}
 		$score=$position*$journalRank*$numAuthorModifier;
-		$updateQuery="UPDATE topneurologistsnetworkmeasures SET SCImagoProminenceScore=(SCImagoProminenceScore+".$score.") WHERE Id=".$row['id'];
+		$updateQuery="UPDATE nodes SET SCImagoProminenceScore=(SCImagoProminenceScore+".$score.") WHERE atomId=".$row['atomId'];
 		mysql_query($updateQuery);
 		echo $updateQuery;
 }
