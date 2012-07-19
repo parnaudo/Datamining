@@ -11,6 +11,8 @@ $Start = getTime();
 $lastEntry=''; 
 $matchFlag=0;
 //remove old data
+clearTable($table);
+clearTable("edge");
 //clearAuthorTables();
 
 //query to get doctor set, can really be from anywhere

@@ -16,17 +16,18 @@ $authorID=1;
 
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
 
-$queryDoctors = "SELECT * FROM `neurologist` where id=1699766238";
+$queryDoctors = "SELECT * FROM `resphcps`";
 
 
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   $query='';
   $count=0;
- 
+  $AuthorQuery=array();
+  $fullAuthorQuery=array();
   //$query=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']); //your query term, searches for both middle name and middle initial
   $middle=substr($row['middleName'],0,1);
-  $filter="";	
+  $filter="Urticaria";	
   $fullAuthorQuery[] = "(".$row['firstName']." ".$row['middleName']." ".$row['lastName']. "[Full Author Name] OR ".$row['firstName']." ".$middle." ".$row['lastName']."[FULL AUTHOR NAME])"; 
   $AuthorQuery[]=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']); 	
   $fullAuthorQuery[]=$filter;
@@ -34,9 +35,10 @@ while($row=mysql_fetch_array($result)){
   $authorCount=$dataminer->eSearch($AuthorQuery,1); 
   $fullAuthorCount=$dataminer->eSearch($fullAuthorQuery,1);
 
-   echo $fullAuthorQuery."= ".$fullAuthorCount." : ".$authorCount;	
- // $updateQuery="UPDATE neurologist SET paperCountFullAuthor=".$count." WHERE id=".$row['id'];
- // mysql_query($updateQuery);
+  // echo $fullAuthorQuery."= ".$fullAuthorCount." : ".$authorCount;	
+  $updateQuery="UPDATE resphcps SET paperCountFullAuthor='".$fullAuthorCount."', paperCount='".$authorCount."' WHERE atomId=".$row['atomId'];
+  echo $updateQuery."<BR>";
+ mysql_query($updateQuery);
 
 }
 $End = getTime(); 

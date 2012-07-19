@@ -14,12 +14,12 @@ Written by Paul Arnaudo 3/10/12
 
 $Start = getTime(); 
 //remove old data from tables
-//clearAuthorTables();
+clearAuthorTables();
 $authorID=1;
 $filter="(MULTIPLE SCLEROSIS [MESH FIELDS] OR MULTIPLE SCLEROSIS [Title] OR MULTIPLE SCLEROSIS [Journal])";
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
 //$queryDoctors = "select * from neurologist where id IN (1760442420)";
-$queryDoctors = "select distinct atomId,firstName,middleName,lastName from ocre where lastName > 'Paul' order by lastName";
+$queryDoctors = "select distinct atomId,firstName,middleName,lastName from ocre order by lastName";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   	$query=array();

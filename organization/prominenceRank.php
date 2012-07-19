@@ -12,8 +12,7 @@ $mysql = new mysql($connection);
 $physicians = "select distinct paper,coauthorposition,numAuthors,a.id,n.atomId,SJR from nodes n INNER JOIN authors a on a.atomId=n.AtomId
 INNER JOIN coauthorinstance c on c.coAuthor=a.id 
 INNER JOIN papers p on p.id=c.paper
-LEFT JOIN journal  j ON (j.ISSN=p.ISSN OR j.Title=p.journal)
- where n.atomId=3814968";
+LEFT JOIN journal  j ON (j.ISSN=p.ISSN OR j.Title=p.journal)";
 $result=mysql_query($physicians);
 while($row=mysql_fetch_array($result)){
 	$updateQuery='';
