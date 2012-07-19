@@ -13,7 +13,7 @@ $number=$math->isPrime($test);
 
 $primeFactors=array();
 for($test=1;$test < sqrt($int);$test++){
-	$primeTest=$math->IsPrime($test);
+	$primeTest=$math->I sPrime($test);
 	if($primeTest!==0){
 		//echo "LOOKING FOR $int divided by $test<br>";	
 		$divisibleTest=$math->modulus($int,$test);

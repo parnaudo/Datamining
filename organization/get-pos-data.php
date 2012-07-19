@@ -1,14 +1,15 @@
 <?php
 
 
-include("lib/init.php");
+include("../lib/init.php");
 $Start = getTime(); 
 
 $dataminer=new dataMiner;
-$table="orgTemp";
+$table="position";
+clearTable($table);
 $atomQuery="Select p.atomId,value,m.name,p.isotopeId,p.tableId,isFixed,m.matterId,s.address from matters m
 INNER JOIN particles p on p.matterId=m.matterId
-INNER JOIN schizo s on s.atomId=p.atomId
+INNER JOIN node s on s.atomId=p.atomId
 where value!='' and isFixed=1 and m.matterId=617 
 ORDER BY m.name";
 $result=mysql_query($atomQuery);
@@ -31,7 +32,7 @@ while($row=mysql_fetch_array($result)){
 			'position'=>$position,
 			'isotopeId'=>$isotopeId
 		);
-		insertQuery($valueArray,'position');
+		insertQuery($valueArray,$table);
 		$count++;	
 		
 	}

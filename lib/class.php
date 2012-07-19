@@ -1,4 +1,72 @@
 <?php
+
+	class publishingInfo{
+		function __construct($atomId){
+					$this->atomId=$atomId;
+		}
+		function getAuthorCount(){
+				$coAuthorCount=0;
+				$sql="select paper from coAuthorInstance c INNER JOIN authors a on coAuthor=a.id where atomId=".$this->atomId;
+				$sqlResult=mysql_query($sql);
+				while($sqlRow=mysql_fetch_array($sqlResult)){
+	
+					$coAuthorSelect= "SELECT count(id) as count from coAuthorInstance where paper=".$sqlRow['paper'];
+					$coAuthorResult=mysql_query($coAuthorSelect);
+					while($coAuthorRow=mysql_fetch_array($coAuthorResult)){
+						$coAuthorCount=$coAuthorCount+($coAuthorRow['count']-1);
+					}
+				}	
+				//$updateQuery="UPDATE node SET numCoauthors='".$coAuthorCount."' WHERE atomId=".$atomId;
+				//echo $updateQuery."<BR>";
+				return $coAuthorCount;
+			
+		
+		}		
+		function getPubCount($type=null){
+				if($type!==null){
+				//first position of author
+					$filter=" AND authorPosition=1";
+				}
+				else{
+				//just get all pubs written
+					$filter="";
+				}
+				$sql="select count(atomId) as count from coAuthorInstance c INNER JOIN authors a on coAuthor=a.id where atomId=".$this->atomId.$filter;
+				$sqlResult=mysql_query($sql);
+				$sqlRow=mysql_fetch_array($sqlResult);
+				$count=$sqlRow['count'];
+				return $count;
+			
+		}
+		function getAuthorInstances(){
+			$paperArray=array();
+			$sql="SELECT paper from coAuthorInstance c INNER JOIN authors a on c.coAuthor=a.id where a.atomId=".$this->atomId;
+			$sqlResult=mysql_query($sql);
+			while($sqlRow=mysql_fetch_array($sqlResult)){	
+				//echo $sqlRow['paper'];
+				$paperArray[]=$sqlRow['paper'];
+			}			
+			return $paperArray;
+		}
+		function getYear($paperId){
+			$sql="SELECT pubDate from papers where id=".$paperId." AND pubDate!=''" ;
+			$sqlResult=mysql_query($sql);
+			$sqlRow=mysql_fetch_array($sqlResult);
+			$date=$sqlRow['pubDate'];
+			$test=date('Y', strtotime($date));
+			echo "TEST $test <BR>";
+			if($test!==FALSE){
+				$year=$test;
+			}
+			else{
+				echo "DATE $date from paper $paperId HAS NO 19 or 20 <BR>";
+				$year=FALSE;
+				//echo "NO YEAR FOUND";
+			}
+			return intval($year);
+		
+		}
+	}
 	Class networkAnalysis{
 
 	    function __construct($x,$y,$z){
@@ -397,7 +465,7 @@
 	
 	}
 
-class mysql {
+class mysql{
 	var $con;
 	function __construct($db=array()) {
 		$default = array(

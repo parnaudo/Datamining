@@ -1,5 +1,5 @@
 <?php 
-include("class.php");
+include ("class.php");
 include("functions.php");
 include("config.php");
 
