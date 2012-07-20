@@ -52,5 +52,5 @@ while($row=mysql_fetch_array($result)){
 }
 
 $End = getTime(); 
-echo "Time taken = ".number_format(($End - $Start),2)." secs with rows: ".$count;
+echo "Time taken = ".number_format(($End - $Start),2)." secs ";
 ?>

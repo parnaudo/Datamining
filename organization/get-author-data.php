@@ -16,10 +16,10 @@ $Start = getTime();
 //remove old data from tables
 clearAuthorTables();
 $authorID=1;
-$filter="(MULTIPLE SCLEROSIS [MESH FIELDS] OR MULTIPLE SCLEROSIS [Title] OR MULTIPLE SCLEROSIS [Journal])";
+$filter="(Schizophrenia [MESH FIELDS] OR Schizophrenia [Title] OR Schizophrenia [Journal])";
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
 //$queryDoctors = "select * from neurologist where id IN (1760442420)";
-$queryDoctors = "select distinct atomId,firstName,middleName,lastName from ocre order by lastName";
+$queryDoctors = "select distinct atomId,firstName,middleName,lastName from node order by lastName";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   	$query=array();

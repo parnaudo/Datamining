@@ -1,6 +1,6 @@
 <?php 
 include("lib/init.php");
-
+/*
 clearTable('yearCounts');
 $getAtoms="SELECT distinct atomId from authors where atomId!=0";
 $result=mysql_query($getAtoms);
@@ -19,10 +19,10 @@ while($row=mysql_fetch_array($result)){
 
 
 $test=' ';
-echo date('Y', strtotime($test));
+echo date('Y', strtotime($test));*/
 //$year=$author->getYear(7968091);
-
 /*
+
 $node=1712046;
 $test=new publishingInfo($node);
 $paper=18397361;
@@ -51,8 +51,9 @@ foreach($yearArray as $column){
 		mysql_query($alterTable);
 
 }
-
-	$result=mysql_query($select);
+*/
+	$sql="SELECT atomId from node n";
+	$result=mysql_query($sql);
 	while($row=mysql_fetch_array($result)){
 			$coAuthorCount=0;
 			$sql="select paper from coAuthorInstance c INNER JOIN authors a on coAuthor=a.id where atomId=".$row['atomId'];
@@ -83,5 +84,5 @@ foreach($yearArray as $column){
 				echo $updateQuery."<BR>";
 				mysql_query($updateQuery);
 			}
-	}*/
+	}
 ?>

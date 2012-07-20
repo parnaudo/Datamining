@@ -73,39 +73,47 @@
 	    	$this->node=$x;
 	    	$this->table=$y;
 	    	$this->threshold=$z; 
+	    	$this->currentTarget=0;
 	    }
 	    
 		function reach(){
 			$nodeArray=array();
 			$firstTargets=$this->getTargets();
+			var_dump($firstTargets);
 			$reach=0;
 			$origin=$this->node;
-			for($i=0;$i < sizeof($firstTargets);$i++){
+			//Get first degree weights and add them
+			for($i=0;$i < sizeof($firstTargets['weight']);$i++){
 				$test=in_array($firstTargets['id'][$i],$nodeArray);
-				if(in_array($firstTargets['id'][$i],$nodeArray)===FALSE){
+				if($test===FALSE){
 					$nodeArray[]=$firstTargets['id'][$i];
 				}
 				$reach=$reach+($firstTargets['weight'][$i]*.5);
-
-	
-				$this->node=$firstTargets['id'][$i];
-				$secondTargets=$this->getTargets();
-				for($j=0;$j < sizeof($secondTargets);$j++){
-					if(in_array($secondTargets['id'][$j],$nodeArray)===FALSE){
-						$nodeArray[]=$secondTargets['id'][$j];
-					}
-					if($secondTargets['id'][$j]==$origin){
-						//don't count scores that head back to origin
-					}
-					else{
-						$reach=$reach+($secondTargets['weight'][$j]*.25);	
+			}
+			
+			//Get second degree weights that don't equal the origin and add them	
+				for($i=0; $i < sizeof($firstTargets['id']);$i++){				
+					$this->node=$firstTargets['id'][$i];
+					$secondTargets=$this->getTargets();
+					for($j=0;$j < sizeof($secondTargets['weight']);$j++){
+						if(in_array($secondTargets['id'][$j],$nodeArray)===FALSE){
+							$nodeArray[]=$secondTargets['id'][$j];
+						}
+						if($secondTargets['id'][$j]==$origin){
+							//don't count scores that head back to origin
+						}
+						else{
+							$reach=$reach+($secondTargets['weight'][$j]*.25);	
+						}
 					}
 				}
-				
-			}
 
+				
+			
+			echo "REACH: $reach";
 			//print_r($nodeArray);
-			return $reach;					
+			return $reach;	
+							
 				
 		}
 		function getTargets(){
@@ -113,6 +121,7 @@
 			$weights=array();
 			$returnArray=array();
 			$select="SELECT target,weight from ".$this->table." where source=".$this->node." AND weight > ".$this->threshold;
+			echo $select."<BR>";
 			$result=mysql_query($select);
 			while($row=mysql_fetch_array($result)){
 				$targets[]=$row['target'];

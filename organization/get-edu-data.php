@@ -10,7 +10,7 @@ foreach($attribute as $attribute){
 }
 $dataminer=new dataMiner;
 function extractEducation($attribute,$table){
-	$queryDoctors = "select atomId,".$attribute." from schizo where ".$attribute."!=''";
+	$queryDoctors = "select atomId,".$attribute." from node where ".$attribute."!=''";
 	echo $queryDoctors;
 	//$queryDoctors = "select atomId,medschool from schizo where medschool!='' and atomId IN (1711601)";
 	//1711550,

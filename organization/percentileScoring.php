@@ -6,8 +6,8 @@ This script creates an address rank based on the number of instances they have i
 Written by Paul Arnaudo 3/29/12 
 */
 include("../lib/init.php");
-$table='nodes';
-$sql = "select column_name from information_schema.columns where table_name='".$table."'";
+$table='bito';
+$sql = "select column_name from information_schema.columns where table_name='".$table."' AND table_schema='".$connection['db']."'";
 $result=mysql_query($sql);
 while($row=mysql_fetch_array($result)){
 	
