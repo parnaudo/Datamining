@@ -1,5 +1,5 @@
 <?php
-include("../lib/init.php");
+include_once("../lib/init.php");
 $Start = getTime(); 
 
 class edgeCreate {
