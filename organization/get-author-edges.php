@@ -28,7 +28,7 @@ $scoringArray=array( array(NULL,1,2,500,'x'),
 clearTable($table);
 
 //include node n to make sure we don't get unwanted nodes 
-$getPapers="SELECT DISTINCT `authors`.id,paper,numAuthors,authorPosition FROM coAuthorInstance INNER JOIN authors ON coAuthor=authors.id INNER JOIN papers ON papers.id=coAuthorInstance.paper INNER JOIN node n on n.atomId=authors.atomId WHERE authors.atomId!=0 and duplicateFlag=0";
+$getPapers="SELECT DISTINCT `authors`.id,paper,numAuthors,authorPosition FROM coAuthorInstance INNER JOIN authors ON coAuthor=authors.id INNER JOIN papers ON papers.id=coAuthorInstance.paper  WHERE authors.atomId!=0 and duplicateFlag=0";
 $result=mysql_query($getPapers);
 //Get distinct information on authors we are looking to search for
 while($row=mysql_fetch_array($result)){

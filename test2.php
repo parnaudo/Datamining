@@ -51,8 +51,8 @@ foreach($yearArray as $column){
 		mysql_query($alterTable);
 
 }
-*/
-	$sql="SELECT atomId from node n";
+*/	$table="measures";
+	$sql="SELECT atomId from $table";
 	$result=mysql_query($sql);
 	while($row=mysql_fetch_array($result)){
 			$coAuthorCount=0;
@@ -66,13 +66,13 @@ foreach($yearArray as $column){
 					$coAuthorCount=$coAuthorCount+($coAuthorRow['count']-1);
 				}
 			}	
-			$updateQuery="UPDATE node SET numCoauthors='".$coAuthorCount."' WHERE atomId=".$row['atomId'];
+			$updateQuery="UPDATE $table SET numCoauthors='".$coAuthorCount."' WHERE atomId=".$row['atomId'];
 			echo $updateQuery."<BR>";
 			mysql_query($updateQuery);
 			$sql="select count(atomId) as count from coAuthorInstance c INNER JOIN authors a on coAuthor=a.id where atomId=".$row['atomId'];
 			$sqlResult=mysql_query($sql);
 			while($sqlRow=mysql_fetch_array($sqlResult)){
-				$updateQuery="UPDATE node SET numPublications='".$sqlRow['count']."' WHERE atomId=".$row['atomId'];
+				$updateQuery="UPDATE $table SET numPublications='".$sqlRow['count']."' WHERE atomId=".$row['atomId'];
 				echo $updateQuery."<BR>";
 				mysql_query($updateQuery);
 			}
@@ -80,7 +80,7 @@ foreach($yearArray as $column){
 			$sql="select count(atomId) as count from coAuthorInstance c INNER JOIN authors a on coAuthor=a.id where atomId=".$row['atomId']." and authorPosition=1";
 			$sqlResult=mysql_query($sql);
 			while($sqlRow=mysql_fetch_array($sqlResult)){
-				$updateQuery="UPDATE node SET numPublicationsFirstAuthor='".$sqlRow['count']."' WHERE atomId=".$row['atomId'];
+				$updateQuery="UPDATE $table SET numPublicationsFirstAuthor='".$sqlRow['count']."' WHERE atomId=".$row['atomId'];
 				echo $updateQuery."<BR>";
 				mysql_query($updateQuery);
 			}

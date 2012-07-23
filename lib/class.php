@@ -423,7 +423,7 @@
 						'lastAuthor'=>$lastAuthor,
 						'pubType'=>$result[0]->Article->PublicationTypeList,
 						'authorCount'=>$authorCount,
-						
+								
 				);
 			}
 							
