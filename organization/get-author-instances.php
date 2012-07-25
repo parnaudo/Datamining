@@ -51,7 +51,7 @@ while($row=mysql_fetch_array($result)){
 		}
 		$pubTypes=implode("; ",$pieces);
 		unset($pieces);
-		
+		$url='http://www.ncbi.nlm.nih.gov/pubmed/'.$value[0];
 		//Get the rest of the info
 		$valueArray=array(
 			'atomId'=>$row['atomId'],
@@ -70,7 +70,8 @@ while($row=mysql_fetch_array($result)){
 			'authors'=>$coAuthorString,
 			'lastAuthor'=>$paperInfo['lastAuthor'],
 			'pubType'=>$pubTypes,
-			'authorCount'=>$paperInfo['authorCount'],					
+			'authorCount'=>$paperInfo['authorCount'],
+			'url'=>$url					
 		);
 		insertQuery($valueArray,$table);		
 	}
