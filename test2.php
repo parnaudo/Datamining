@@ -51,8 +51,9 @@ foreach($yearArray as $column){
 		mysql_query($alterTable);
 
 }
-*/	$table="measures";
-	$sql="SELECT atomId from $table";
+*/	$table="nodecomplete";
+	$sql="SELECT atomId from $table where numPublications IS NULL";
+	echo $sql;
 	$result=mysql_query($sql);
 	while($row=mysql_fetch_array($result)){
 			$coAuthorCount=0;

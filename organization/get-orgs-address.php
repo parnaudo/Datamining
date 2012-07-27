@@ -5,7 +5,7 @@ $table='edge';
 $dataminer=new dataMiner;
 
 //Right now this is limited to organizations that have more than one record from the set, can change whenever though.
-$queryDoctors = "select distinct Institution from ocre where Institution!='' order by Institution ";
+$queryDoctors = "select distinct StandardizedInstitutionName from ocre where StandardizedInstitutionName!='' order by StandardizedInstitutionName ";
 $avgSQL="select avg(weight) as avg from edge";
 $avgResult=mysql_query($avgSQL);
 $row=mysql_fetch_array($avgResult);
@@ -13,7 +13,7 @@ $baseWeight=$row['avg']*2;
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
 
-	$getPhysicians="SELECT distinct atomId from ocre where Institution='".$row['Institution']. "'";
+	$getPhysicians="SELECT distinct atomId from ocre where StandardizedInstitutionName='".$row['StandardizedInstitutionName']. "'";
 //find org info and add an entity to the organization table
 	echo $getPhysicians."<BR>";
 	//getOrgInfo($row['srcIsotopeId'],$row['dstAtomId'],$table);

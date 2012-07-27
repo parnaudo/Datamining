@@ -6,7 +6,8 @@ This script creates an address rank based on the number of instances they have i
 Written by Paul Arnaudo 3/29/12 
 */
 include("../lib/init.php");
-$table='measures';
+$table='nodecomplete';
+/*
 $sql = "select column_name from information_schema.columns where table_name='".$table."' AND table_schema='".$connection['db']."'";
 $result=mysql_query($sql);
 while($row=mysql_fetch_array($result)){
@@ -19,9 +20,10 @@ while($row=mysql_fetch_array($result)){
 		mysql_query($alterTable);
 		updatePercentiles($table,$row['column_name'],$column);
 	}
-}
-/*updatePercentiles("topneurologistsnetworkmeasures","paperCount","PaperCountPercentile");
-updatePercentiles("topneurologistsnetworkmeasures","ClosenessCentrality","ClosenessPercentile");
+}*/
+
+updatePercentiles("nodecomplete","SCImagoProminenceScore","SCImagoProminenceScorePercentile");
+/*updatePercentiles("topneurologistsnetworkmeasures","ClosenessCentrality","ClosenessPercentile");
 updatePercentiles("topneurologistsnetworkmeasures","BetweennessCentrality","BetweennessPercentile");
 updatePercentiles("topneurologistsnetworkmeasures","SCImagoProminenceScore","SCImagoProminenceScorePercentile");*/
 function updatePercentiles($table,$field,$percentileField){

@@ -4,7 +4,7 @@
 $connection = array(
 	'host' => 'localhost',
 	'user' => 'root',
-	'pass' => '',
+	'pass' => 'rubberbabybuggybumpers',
 	'db' => 'zephyr'
 );
 

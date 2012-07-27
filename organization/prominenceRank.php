@@ -9,7 +9,7 @@ include("../lib/init.php");
 
 $mysql = new mysql($connection);
 
-$physicians = "select distinct paper,coauthorposition,numAuthors,a.id,n.atomId,SJR from nodes n INNER JOIN authors a on a.atomId=n.AtomId
+$physicians = "select distinct paper,coauthorposition,numAuthors,a.id,n.atomId,SJR from nodecomplete n INNER JOIN authors a on a.atomId=n.AtomId
 INNER JOIN coauthorinstance c on c.coAuthor=a.id 
 INNER JOIN papers p on p.id=c.paper
 LEFT JOIN journal  j ON (j.ISSN=p.ISSN OR j.Title=p.journal)";
@@ -44,7 +44,7 @@ while($row=mysql_fetch_array($result)){
 		$journalRank=$row['SJR'];
 		}
 		$score=$position*$journalRank*$numAuthorModifier;
-		$updateQuery="UPDATE nodes SET SCImagoProminenceScore=(SCImagoProminenceScore+".$score.") WHERE atomId=".$row['atomId'];
+		$updateQuery="UPDATE nodecomplete SET SCImagoProminenceScore=(SCImagoProminenceScore+".$score.") WHERE atomId=".$row['atomId'];
 		mysql_query($updateQuery);
 		echo $updateQuery;
 }

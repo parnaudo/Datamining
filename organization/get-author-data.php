@@ -14,17 +14,23 @@ Written by Paul Arnaudo 3/10/12
 
 $Start = getTime(); 
 //remove old data from tables
-clearAuthorTables();
-$authorID=1;
-$filter="(Schizophrenia [MESH FIELDS] OR Schizophrenia [Title] OR Schizophrenia [Journal])";
+//clearAuthorTables();
+$authorID=15149;
+$filter="(Multiple Sclerosis [MESH FIELDS] OR Multiple Sclerosis [Title] OR Multiple Sclerosis [Journal])";
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
 //$queryDoctors = "select * from neurologist where id IN (1760442420)";
-$queryDoctors = "select distinct atomId,firstName,middleName,lastName from node order by lastName";
+$queryDoctors = "select * from largecounts where atomId NOT IN (select distinct atomId from authors)";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   	$query=array();
-	$count=0;
-	$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']); //your query term, searches for both middle name and middle initials	
+	$count=0;	
+	//see whether to use author or full author name
+	if($row['paperCount']==$row['truePaperCount']){
+		$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']);
+	}
+	else{
+		$author=  $row['firstName']." ".$row['middleName']." ".$row['lastName']." [FULL AUTHOR NAME]";
+	}; //your query term, searches for both middle name and middle initials	
 
 //	echo $author."<BR>";
 	$query[]=$author;
@@ -55,13 +61,15 @@ while($row=mysql_fetch_array($result)){
 				  $pubmedName=$authors->LastName." ".$authors->Initials;
 				  $lastName=$authors->LastName;
 				  $foreName=$authors->ForeName;
+				  $author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']);
 				  $author=str_replace('[Author]',"",$author);
+				  echo "$author VS $pubmedName<BR>";
 				  if(stripos($author,$pubmedName)===0 || stripos($pubmedName, $author)===0){
 				 	 $physicianQuery=$author;	
 					 $atomId=$row['atomId'];
 					 $authorMatch=1;
 				  }	
-				   echo $author." VS ".$pubmedName." ".$authorMatch."<BR>";			  
+						  
 				  $testQuery= 'SELECT id,atomId FROM authors WHERE name LIKE "%'.$pubmedName.'%"';
 				  $resultAuthor=mysql_query($testQuery);
 				  $dupeTest = mysql_num_rows($resultAuthor);
@@ -79,6 +87,7 @@ while($row=mysql_fetch_array($result)){
 				  else{
 					  $insertAuthor="INSERT INTO authors(id,name, atomId,lastName,foreName) VALUES ('".$authorID."','".mysql_escape_string($pubmedName)."','".
 					  $atomId."','".mysql_escape_string($lastName)."','".mysql_escape_string($foreName)."')";
+					  echo $insertAuthor."<BR>";
 					  mysql_query($insertAuthor)  or die ("Error in query: $query. ".mysql_error());
 					  $authorID++;
 				  }
@@ -88,7 +97,9 @@ while($row=mysql_fetch_array($result)){
 						mysql_query($paperQuery)  or die ("Error in query: $query. ".mysql_error());
 						$countPaperQuery++;
 					 }
+					
 					$updateAuthorQuery="UPDATE authors set  atomId='".$atomId."' WHERE id='".$coAuthor."'";
+					 echo $updateAuthorQuery."<BR>";
 					mysql_query($updateAuthorQuery)  or die ("Error in query: $query. ".mysql_error());  		
 					$insertCoAuthorInstance = "INSERT INTO coAuthorInstance (coAuthor, paper, coAuthorPosition, authorAtomId,query) VALUES ('".$coAuthor."','".$paperID."','".$countAuthors."','".$row['atomId']."','".mysql_escape_string($author)."')";
 				  	mysql_query($insertCoAuthorInstance)  or die ("Error in query: $query. ".mysql_error());		
@@ -104,7 +115,7 @@ while($row=mysql_fetch_array($result)){
 				  
 				  else{
 					  if($authorMatch==1){
-						$updateAuthorQuery="UPDATE authors set  atomId='".$atomId."' WHERE id='".$coAuthor."'";
+						$updateAuthorQuery="UPDATE authors set  atomId='".$atomId."' WHERE id='".$coAuthor."'";			echo $updateAuthorQuery."<BR>";
 						mysql_query($updateAuthorQuery)  or die ("Error in query: $query. ".mysql_error());  
 						$updateQuery="UPDATE coAuthorInstance SET query='".mysql_escape_string($author)."' WHERE paper=".$paperID." AND coAuthor='".$coAuthor."'"; 
 						mysql_query($updateQuery)  or die ("Error in query: $query. ".mysql_error());  
