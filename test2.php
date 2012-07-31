@@ -51,8 +51,8 @@ foreach($yearArray as $column){
 		mysql_query($alterTable);
 
 }
-*/	$table="nodecomplete";
-	$sql="SELECT atomId from $table where numPublications IS NULL";
+*/	$table="nodeComplete";
+	$sql="SELECT atomId from $table";
 	echo $sql;
 	$result=mysql_query($sql);
 	while($row=mysql_fetch_array($result)){

@@ -57,7 +57,7 @@ while($row=mysql_fetch_array($result)){
 			'source'=>$row['source'],
 			'target'=>$row['target'],
 			'weight'=>$row['weight'],
-			'direction'=>'Directed',
+			'Type'=>'Directed',
 			'certainty'=>1
 		);
 		insertQuery($valueArray,'edgeCache');
@@ -71,6 +71,6 @@ $edgeCount=getRowCount($edgeTypes);
 certainty($edgeCount);
 
 $End = getTime(); 
-echo "Time taken = ".number_format(($End - $Start),2)." secs with $updateCount updates";
+echo "Time taken = ".number_format(($End - $Start),2)." secs ";
 
 ?>

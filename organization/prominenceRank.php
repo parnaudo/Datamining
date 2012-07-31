@@ -8,9 +8,9 @@ Written by Paul Arnaudo 3/29/12
 include("../lib/init.php");	
 
 $mysql = new mysql($connection);
-
-$physicians = "select distinct paper,coauthorposition,numAuthors,a.id,n.atomId,SJR from nodecomplete n INNER JOIN authors a on a.atomId=n.AtomId
-INNER JOIN coauthorinstance c on c.coAuthor=a.id 
+$table="nodeComplete";
+$physicians = "select distinct paper,coAuthorPosition,numAuthors,a.id,n.atomId,SJR from nodeComplete n INNER JOIN authors a on a.atomId=n.AtomId
+INNER JOIN coAuthorInstance c on c.coAuthor=a.id 
 INNER JOIN papers p on p.id=c.paper
 LEFT JOIN journal  j ON (j.ISSN=p.ISSN OR j.Title=p.journal)";
 $result=mysql_query($physicians);
@@ -44,7 +44,7 @@ while($row=mysql_fetch_array($result)){
 		$journalRank=$row['SJR'];
 		}
 		$score=$position*$journalRank*$numAuthorModifier;
-		$updateQuery="UPDATE nodecomplete SET SCImagoProminenceScore=(SCImagoProminenceScore+".$score.") WHERE atomId=".$row['atomId'];
+		$updateQuery="UPDATE nodeComplete SET SCImagoProminenceScore=(SCImagoProminenceScore+".$score.") WHERE atomId=".$row['atomId'];
 		mysql_query($updateQuery);
 		echo $updateQuery;
 }
