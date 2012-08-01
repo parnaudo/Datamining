@@ -280,7 +280,7 @@
 	 		 	$params = array(
 	    			'db' => 'pubmed',
 	   				'retmode' => 'xml',
-	    			'retmax' => 500,
+	    			'retmax' => 150000,
 	    			'usehistory' => 'y',
 					'tool' => 'SCUcitationminer',
 					'email' => 'parnaudo@scu.edu',
@@ -292,6 +292,9 @@
 	//Retrieve the pubmed UIDs to then retrieve summaries for
 	  			$xml = simplexml_load_file($url);
 				$count= (int) $xml->Count;
+				$webEnv=$xml->WebEnv;
+				$queryKey=$xml->QueryKey;
+				
 	//if set, just return count			
 				if($countFlag==1){
 					return $count;	
@@ -306,6 +309,8 @@
 					 $paperInfo = array(
 					 			'papers'=>$papers,
 					 			'count'=>$count,
+					 			'webEnv'=>$webEnv,
+					 			'queryKey'=>$queryKey
 					 			);
 					return $paperInfo;		
 				}
