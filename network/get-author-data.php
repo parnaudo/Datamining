@@ -77,8 +77,9 @@ while($row=mysql_fetch_array($result)){
 					 $atomId=$row['atomId'];
 					 $authorMatch=1;
 				  }	
-						  
-				  $testQuery= 'SELECT id,atomId FROM authors WHERE lastName LIKE "'.$lastName.'" AND foreName LIKE "'.$foreName.'"';
+				  $testQuery= 'SELECT id,atomId FROM authors WHERE name LIKE "%'.$pubmedName.'%"';	  
+				  //This is used for Aaron's current project, creates more duplicates but good for being deduped later
+				  //$testQuery= 'SELECT id,atomId FROM authors WHERE lastName LIKE "'.$lastName.'" AND foreName LIKE "'.$foreName.'"';
 				  $resultAuthor=mysql_query($testQuery);
 				  $dupeTest = mysql_num_rows($resultAuthor);
 				  //checks to see if author has already been inputted

@@ -51,7 +51,11 @@ foreach($yearArray as $column){
 		mysql_query($alterTable);
 
 }
-*/	$table="nodeComplete";
+*/
+$table="nodeComplete";
+authorCounts($table);
+function authorCounts($table){
+
 	$sql="SELECT atomId from $table";
 	echo $sql;
 	$result=mysql_query($sql);
@@ -86,4 +90,5 @@ foreach($yearArray as $column){
 				mysql_query($updateQuery);
 			}
 	}
+}	
 ?>
