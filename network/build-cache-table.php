@@ -57,7 +57,7 @@ while($row=mysql_fetch_array($result)){
 			'source'=>$row['source'],
 			'target'=>$row['target'],
 			'weight'=>$row['weight'],
-			'Type'=>'Directed',
+			'Type'=>'Undirected',
 			'certainty'=>1
 		);
 		insertQuery($valueArray,'edgeCache');
