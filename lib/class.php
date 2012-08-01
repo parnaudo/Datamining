@@ -405,7 +405,7 @@
 					}
 					$authors=$result[0]->Article->AuthorList->Author;
 					$lastAuthor=$authors[$authorCount]->LastName." ".$authors[$authorCount]->Initials;
-					
+					$meshTerms=$result[0]->MeshHeadingList;
 	  	  		 	$paperInfo=array(
 						'affiliation'=> $result[0]->Article->Affiliation,
 						'abstract'=> $result[0]->Article->Abstract,
@@ -423,6 +423,7 @@
 						'lastAuthor'=>$lastAuthor,
 						'pubType'=>$result[0]->Article->PublicationTypeList,
 						'authorCount'=>$authorCount,
+						'meshTerms'=>$meshTerms,
 								
 				);
 			}

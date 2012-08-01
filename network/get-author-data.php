@@ -118,6 +118,10 @@ while($row=mysql_fetch_array($result)){
 						foreach($paperInfo['pubType']->PublicationType as $typeText){
 							$pieces[]=$typeText[0];	
 						}
+						foreach($paperInfo['meshTerms']->MeshHeading as $meshText){
+	 						$pieces[]=$meshText[0]->DescriptorName;	
+						}
+							$meshTerms=implode('; ',$pieces);
 						$pubTypes=implode("; ",$pieces);
 						unset($pieces);
 						$url='http://www.ncbi.nlm.nih.gov/pubmed/'.$paperID;
@@ -136,7 +140,8 @@ while($row=mysql_fetch_array($result)){
 							'title'=>$paperInfo['title'],
 							'pubType'=>$pubTypes,
 							'authorCount'=>$paperInfo['authorCount'],
-							'url'=>$url					
+							'url'=>$url,
+							'meshTerms'=>$meshTerms					
 						);
 						insertQuery($valueArray,'papers');
 						$countPaperQuery++;
