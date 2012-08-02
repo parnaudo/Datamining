@@ -4,8 +4,8 @@
 $connection = array(
 	'host' => 'localhost',
 	'user' => 'root',
-	'pass' => 'root',
-	'db' => 'Rheumatology'
+	'pass' => '',
+	'db' => 'test'
 );
 
 $mysql = new mysql($connection);

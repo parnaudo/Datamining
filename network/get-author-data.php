@@ -25,31 +25,40 @@ if($maxRow['max']==NULL){
 else{
 	$authorID=$maxRow['max']+1;
 }
-$filter="(Rheumatoid Arthritis [MESH FIELDS] OR Rheumatoid Arthritis [Title] OR Rheumatoid Arthritis [Journal])";
+$filter="(Multiple Sclerosis [MESH FIELDS] OR Multiple Sclerosis [Title] OR Multiple Sclerosis [Journal])";
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
-//$queryDoctors = "select * from neurologist where id IN (1760442420)";
-$queryDoctors = "select * from RheumatologyHCPs where atomId=32678";
+//$queryDoctors = "select * from largecounts where atomId IN (3814943)";
+$queryDoctors = "select * from largecounts l inner join ocrelarge o on l.atomId=o.atomId order by truePaperCount desc limit 250 ";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   	$count=0;
   	$query=array();	
-	$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']);
 	//$author= $row['firstName']." ".$row['lastName']." [FULL AUTHOR NAME]";
 	//see whether to use author or full author name
+	if($row['paperCount']==$row['truePaperCount']){
 
+		$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']);
+
+	}
+
+	else{
+
+		$author=  $row['firstName']." ".$row['middleName']." ".$row['lastName']." [FULL AUTHOR NAME]";
+
+	};
 	$query[]=$author;
 	if(!empty($filter)){
 		$query[]=$filter;
 	}
 	$uids=$dataminer->eSearch($query,0);
 //if there are papers, insert an author record	
-	foreach($uids['papers'] as $key=>$paperID){
+	foreach($uids['papers'] as $key=>$test){
 		$paperFlag=0;
 		$countPaperQuery=0;
+		$paperID=intval($test);
 		$paperQuery="SELECT id FROM papers where id=".$paperID;	
 		$resultPaper=mysql_query($paperQuery);
 		$paperFlag = mysql_num_rows($resultPaper);	
-		
 		  $paperInfo=$dataminer->eFetch($paperID);
 		  $countAuthors=0;
 		  foreach($paperInfo['authors'] as $field){
@@ -97,10 +106,10 @@ while($row=mysql_fetch_array($result)){
 				  //if the author doesn't exist, create a new one
 				  		$authorArray=array(
 				  			'id'=>$authorID,
-				  			'name'=>mysql_escape_string($pubmedName),
+				  			'name'=>mysql_real_escape_string($pubmedName),
 				  			'atomId'=>$atomId,
-				  			'lastName'=>mysql_escape_string($lastName),
-				  			'foreName'=>mysql_escape_string($foreName)
+				  			'lastName'=>mysql_real_escape_string($lastName),
+				  			'foreName'=>mysql_real_escape_string($foreName)
 				  		);
 						insertQuery($authorArray,'authors');
 					  	$authorID++;
@@ -156,7 +165,7 @@ while($row=mysql_fetch_array($result)){
 						'paper'=>$paperID,
 						'coAuthorPosition'=>$countAuthors,
 						'authorAtomId'=>$row['atomId'],
-						'query'=>mysql_escape_string($author)
+						'query'=>mysql_real_escape_string($author)
 					);
 					
 					insertQuery($instanceArray,'coAuthorInstance')	;
@@ -170,7 +179,7 @@ while($row=mysql_fetch_array($result)){
 						'paper'=>$paperID,
 						'coAuthorPosition'=>$countAuthors,
 						'authorAtomId'=>$row['atomId'],
-						'query'=>mysql_escape_string($physicianQuery)
+						'query'=>mysql_real_escape_string($physicianQuery)
 					);
 					
 					insertQuery($instanceArray,'coAuthorInstance');										
@@ -182,7 +191,7 @@ while($row=mysql_fetch_array($result)){
 					  if($authorMatch==1){
 						$updateAuthorQuery="UPDATE authors set  atomId='".$atomId."' WHERE id='".$coAuthor."'";			echo $updateAuthorQuery."<BR>";
 						mysql_query($updateAuthorQuery)  or die ("Error in query: $query. ".mysql_error());  
-						$updateQuery="UPDATE coAuthorInstance SET query='".mysql_escape_string($author)."' WHERE paper=".$paperID." AND coAuthor='".$coAuthor."'"; 
+						$updateQuery="UPDATE coAuthorInstance SET query='".mysql_real_escape_string($author)."' WHERE paper=".$paperID." AND coAuthor='".$coAuthor."'"; 
 						mysql_query($updateQuery)  or die ("Error in query: $query. ".mysql_error());  
 					  	
 					  }

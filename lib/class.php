@@ -280,7 +280,7 @@
 	 		 	$params = array(
 	    			'db' => 'pubmed',
 	   				'retmode' => 'xml',
-	    			'retmax' => 150000,
+	    			'retmax' => 500,
 	    			'usehistory' => 'y',
 					'tool' => 'SCUcitationminer',
 					'email' => 'parnaudo@scu.edu',
@@ -380,14 +380,15 @@
 				return $paperInfo;
 			}
 			function eFetch($uid){
+				echo $uid."<BR>";
 				$sumParams = array(
 	   		 		'db' => 'pubmed',
 					'tool' => 'SCUcitationminer',
 					'email' => 'parnaudo@scu.edu',
 					'retmode' => 'xml',
-	    			'id' => $uid,
+	    			'id' => $uid
 	   		 	);
-	   		 	
+	   		 	var_dump($sumParams);
 	   		 	 $url= "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?". http_build_query($sumParams,'','&'); 
 	   		 	 $url=str_replace('%5B0%5D','',$url);
 				 echo $url;
