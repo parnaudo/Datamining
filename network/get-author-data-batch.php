@@ -14,7 +14,7 @@ Written by Paul Arnaudo 3/10/12
 
 $Start = getTime(); 
 //remove old data from tables
-clearAuthorTables();
+//clearAuthorTables();
 
 $max="SELECT MAX(id) as max FROM authors";
 $maxResult=mysql_query($max);

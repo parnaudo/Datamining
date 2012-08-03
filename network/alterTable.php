@@ -9,6 +9,7 @@ alter table $table add column numPublicationsFirstAuthor int(5) DEFAULT 0;
 alter table $table add column numCoauthors int(5) DEFAULT 0;
 alter table $table add column reach float DEFAULT 0;
 alter table $table add column SCImagoProminenceScore float DEFAULT 0;"
+mysql_query($alterQuery);
 /*
 	if($row['paperCount']==$row['truePaperCount']){
 		$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']);
