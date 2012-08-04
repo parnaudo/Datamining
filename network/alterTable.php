@@ -1,15 +1,16 @@
 <?php
 include("../lib/init.php");
-$sql="select * from largecounts where atomId=401662";
-$result=mysql_query($sql);
-echo "TEST";
-$alterQuery="
-alter table $table add column numPublications int(5) DEFAULT 0;
-alter table $table add column numPublicationsFirstAuthor int(5) DEFAULT 0;
-alter table $table add column numCoauthors int(5) DEFAULT 0;
-alter table $table add column reach float DEFAULT 0;
-alter table $table add column SCImagoProminenceScore float DEFAULT 0;"
-mysql_query($alterQuery);
+$table="edge";
+$threshold=1;
+//alterNodeTable($table);
+
+$pub= new publishingInfo(3814943);
+$network=new networkAnalysis(3814943,$table,$threshold);
+$pubCount=$pub->getPubCount();
+$pubCountFirstAuthor=$pub->getPubCount(1);
+$authorCount=$pub->getAuthorCount();
+$reach=$network->reach();
+echo "$pubCount : $pubCountFirstAuthor : $authorCount : $reach";
 /*
 	if($row['paperCount']==$row['truePaperCount']){
 		$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']);

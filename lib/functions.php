@@ -1,6 +1,18 @@
 <?php
 
-	
+function alterNodeTable($table){
+	$alterQuery="alter table $table add column numPublications int(5) DEFAULT 0";
+	echo $alterQuery;
+	mysql_query($alterQuery);
+	$alterQuery="alter table $table add column numPublicationsFirstAuthor int(5) DEFAULT 0";
+	mysql_query($alterQuery);
+	$alterQuery="alter table $table add column numCoauthors int(5) DEFAULT 0";
+	mysql_query($alterQuery);
+	$alterQuery="alter table $table add column reach float DEFAULT 0";
+	mysql_query($alterQuery);
+	$alterQuery="alter table $table add column SCImagoProminenceScore float DEFAULT 0";
+	mysql_query($alterQuery);
+}	
 function authorPubmedTransform($first,$middle,$last){
 	 $middle=substr($middle,0,1);
  	 $first=substr($first,0,1);	
@@ -243,10 +255,10 @@ table attributes are key
 */
 $variables=array();
 foreach($valueArray as $name=>$value){
-		$variables[]=mysql_escape_string($name);
-		$values[]=mysql_escape_string($value);
+		$variables[]=$name;
+		$values[]=$value;
 	}
-	$insertQuery="INSERT INTO ".$table." (".implode(",",$variables).") VALUES ('".implode("','",$values)."')";
+	$insertQuery='INSERT INTO '.$table.' ('.implode(",",$variables).') VALUES ("'.implode('","',$values).'")';
 	echo $insertQuery."<BR>";
 	mysql_query($insertQuery);
 }

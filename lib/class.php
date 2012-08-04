@@ -6,14 +6,16 @@
 		}
 		function getAuthorCount(){
 				$coAuthorCount=0;
-				$sql="select paper from coAuthorInstance c INNER JOIN authors a on coAuthor=a.id where atomId=".$this->atomId;
+				$sql="select distinct paper from coAuthorInstance c INNER JOIN authors a on coAuthor=a.id where atomId=".$this->atomId;
 				$sqlResult=mysql_query($sql);
 				while($sqlRow=mysql_fetch_array($sqlResult)){
 	
 					$coAuthorSelect= "SELECT count(id) as count from coAuthorInstance where paper=".$sqlRow['paper'];
 					$coAuthorResult=mysql_query($coAuthorSelect);
 					while($coAuthorRow=mysql_fetch_array($coAuthorResult)){
+					
 						$coAuthorCount=$coAuthorCount+($coAuthorRow['count']-1);
+					
 					}
 				}	
 				//$updateQuery="UPDATE node SET numCoauthors='".$coAuthorCount."' WHERE atomId=".$atomId;
@@ -31,7 +33,8 @@
 				//just get all pubs written
 					$filter="";
 				}
-				$sql="select count(atomId) as count from coAuthorInstance c INNER JOIN authors a on coAuthor=a.id where atomId=".$this->atomId.$filter;
+				$sql="select count(distinct paper) as count from coAuthorInstance c INNER JOIN authors a on coAuthor=a.id where atomId=".$this->atomId.$filter;
+				echo $sql;
 				$sqlResult=mysql_query($sql);
 				$sqlRow=mysql_fetch_array($sqlResult);
 				$count=$sqlRow['count'];

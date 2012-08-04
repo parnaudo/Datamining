@@ -14,7 +14,7 @@ Written by Paul Arnaudo 3/10/12
 
 $Start = getTime(); 
 //remove old data from tables
-clearAuthorTables();
+//clearAuthorTables();
 
 $max="SELECT MAX(id) as max FROM authors";
 $maxResult=mysql_query($max);
@@ -28,7 +28,7 @@ else{
 $filter="(Multiple Sclerosis [MESH FIELDS] OR Multiple Sclerosis [Title] OR Multiple Sclerosis [Journal])";
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
 //$queryDoctors = "select * from largecounts where atomId IN (3814943)";
-$queryDoctors = "select * from largecounts l inner join ocrelarge o on l.atomId=o.atomId order by truePaperCount desc limit 250 ";
+$queryDoctors = "select * from ocreNew where atomId NOT IN (select distinct atomId from authors)";
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
   	$count=0;
@@ -87,6 +87,7 @@ while($row=mysql_fetch_array($result)){
 					 $authorMatch=1;
 				  }	
 				  $testQuery= 'SELECT id,atomId FROM authors WHERE name LIKE "%'.$pubmedName.'%"';	  
+				  echo $testQuery;
 				  //This is used for Aaron's current project, creates more duplicates but good for being deduped later
 				  //$testQuery= 'SELECT id,atomId FROM authors WHERE lastName LIKE "'.$lastName.'" AND foreName LIKE "'.$foreName.'"';
 				  $resultAuthor=mysql_query($testQuery);
@@ -106,10 +107,10 @@ while($row=mysql_fetch_array($result)){
 				  //if the author doesn't exist, create a new one
 				  		$authorArray=array(
 				  			'id'=>$authorID,
-				  			'name'=>mysql_real_escape_string($pubmedName),
+				  			'name'=>$pubmedName,
 				  			'atomId'=>$atomId,
-				  			'lastName'=>mysql_real_escape_string($lastName),
-				  			'foreName'=>mysql_real_escape_string($foreName)
+				  			'lastName'=>$lastName,
+				  			'foreName'=>$foreName
 				  		);
 						insertQuery($authorArray,'authors');
 					  	$authorID++;
