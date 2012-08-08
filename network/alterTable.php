@@ -1,16 +1,19 @@
 <?php
 include("../lib/init.php");
-$table="edge";
+$table="node";
 $threshold=1;
-//alterNodeTable($table);
-
-$pub= new publishingInfo(3814943);
-$network=new networkAnalysis(3814943,$table,$threshold);
+alterNodeTable($table);
+$select="SELECT distinct atomId from $table ";
+$result=mysql_query($select);
+while($row=mysql_fetch_array($result)){
+$pub= new publishingInfo($row['atomId']);
+$network=new networkAnalysis($row['atomId'],edgeCache,$threshold);
 $pubCount=$pub->getPubCount();
 $pubCountFirstAuthor=$pub->getPubCount(1);
 $authorCount=$pub->getAuthorCount();
 $reach=$network->reach();
 echo "$pubCount : $pubCountFirstAuthor : $authorCount : $reach";
+}
 /*
 	if($row['paperCount']==$row['truePaperCount']){
 		$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']);
