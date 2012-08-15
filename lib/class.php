@@ -10,7 +10,7 @@
 				$sqlResult=mysql_query($sql);
 				while($sqlRow=mysql_fetch_array($sqlResult)){
 	
-					$coAuthorSelect= "SELECT count(id) as count from coAuthorInstance where paper=".$sqlRow['paper'];
+					$coAuthorSelect= "SELECT count( distinct coAuthor) as count from coAuthorInstance where paper=".$sqlRow['paper'];
 					$coAuthorResult=mysql_query($coAuthorSelect);
 					while($coAuthorRow=mysql_fetch_array($coAuthorResult)){
 					
@@ -396,6 +396,11 @@
 	   		 	 $url=str_replace('%5B0%5D','',$url);
 				 echo $url;
 				$xml = simplexml_load_file($url);
+			   	if($xml==NULL){
+               		 echo "BAD DATA";
+                	 return;
+       			 }
+
 				$bookTest= $xml->xpath('/PubmedArticleSet/PubmedBookArticle/BookDocument');
 				$bookTitle=$bookTest[0]->Book->BookTitle;
 				if($bookTitle!=''){

@@ -25,17 +25,20 @@ if($maxRow['max']==NULL){
 else{
 	$authorID=$maxRow['max']+1;
 }
+echo "starting from $authorID<BR>";
 $filter="(Multiple Sclerosis [MESH FIELDS] OR Multiple Sclerosis [Title] OR Multiple Sclerosis [Journal])";
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
 //$queryDoctors = "select * from largecounts where atomId IN (3814943)";
-$queryDoctors = "select * from ocreNew where atomId NOT IN (select distinct atomId from authors)";
+$queryDoctors = "select * from ocreComplete o INNER JOIN ocreExportFinal e on Id=atomId where Top200List!='Y'";
 $result = mysql_query($queryDoctors) or die(mysql_error());
+
 while($row=mysql_fetch_array($result)){
   	$count=0;
   	$query=array();	
-	//$author= $row['firstName']." ".$row['lastName']." [FULL AUTHOR NAME]";
+//	$author= $row['firstName']." ".$row['lastName']." [FULL AUTHOR NAME]";
+	$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']);
 	//see whether to use author or full author name
-	if($row['paperCount']==$row['truePaperCount']){
+	/*if($row['paperCount']==$row['truePaperCount']){
 
 		$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']);
 
@@ -45,7 +48,7 @@ while($row=mysql_fetch_array($result)){
 
 		$author=  $row['firstName']." ".$row['middleName']." ".$row['lastName']." [FULL AUTHOR NAME]";
 
-	};
+	};*/
 	$query[]=$author;
 	if(!empty($filter)){
 		$query[]=$filter;
@@ -57,6 +60,7 @@ while($row=mysql_fetch_array($result)){
 		$countPaperQuery=0;
 		$paperID=intval($test);
 		$paperQuery="SELECT id FROM papers where id=".$paperID;	
+		echo $paperQuery."<BR>";
 		$resultPaper=mysql_query($paperQuery);
 		$paperFlag = mysql_num_rows($resultPaper);	
 		  $paperInfo=$dataminer->eFetch($paperID);
@@ -87,7 +91,7 @@ while($row=mysql_fetch_array($result)){
 					 $authorMatch=1;
 				  }	
 				  $testQuery= 'SELECT id,atomId FROM authors WHERE name LIKE "%'.$pubmedName.'%"';	  
-				  echo $testQuery;
+				  //echo $testQuery;
 				  //This is used for Aaron's current project, creates more duplicates but good for being deduped later
 				  //$testQuery= 'SELECT id,atomId FROM authors WHERE lastName LIKE "'.$lastName.'" AND foreName LIKE "'.$foreName.'"';
 				  $resultAuthor=mysql_query($testQuery);

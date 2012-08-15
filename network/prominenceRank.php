@@ -9,10 +9,11 @@ include("../lib/init.php");
 
 $mysql = new mysql($connection);
 $table="nodeComplete";
+networkProminence();
 function networkProminence(){
-	$physicians = "select distinct paper,coAuthorPosition,numAuthors,a.id,n.atomId,SJR from nodeComplete n INNER JOIN authors a on a.atomId=n.AtomId
+	$physicians = "select distinct paper,coAuthorPosition,authorCount,a.id,a.atomId,SJR from nodeComplete n INNER JOIN authors a on a.atomId=n.Id
 	INNER JOIN coAuthorInstance c on c.coAuthor=a.id 
-	INNER JOIN papers p on p.id=c.paper
+	INNER JOIN papers p on p.articleId=c.paper
 	LEFT JOIN journal  j ON (j.ISSN=p.ISSN OR j.Title=p.journal) ";
 	$result=mysql_query($physicians);
 	while($row=mysql_fetch_array($result)){

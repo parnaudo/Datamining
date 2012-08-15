@@ -1,17 +1,20 @@
 <?php
 include("../lib/init.php");
-$table="node";
+$table="nodeComplete";
 $threshold=1;
 alterNodeTable($table);
-$select="SELECT distinct atomId from $table ";
+$select="SELECT distinct Id from $table ";
 $result=mysql_query($select);
 while($row=mysql_fetch_array($result)){
-$pub= new publishingInfo($row['atomId']);
-$network=new networkAnalysis($row['atomId'],edgeCache,$threshold);
+$pub= new publishingInfo($row['Id']);
+$network=new networkAnalysis($row['Id'],'edgeCache',$threshold);
 $pubCount=$pub->getPubCount();
 $pubCountFirstAuthor=$pub->getPubCount(1);
 $authorCount=$pub->getAuthorCount();
 $reach=$network->reach();
+$updateQuery="UPDATE $table set numPublications=$pubCount, numPublicationsFirstAuthor=$pubCountFirstAuthor, numCoauthors=$authorCount, reach=$reach where Id=".$row['Id'];
+echo $updateQuery;
+mysql_query($updateQuery);
 echo "$pubCount : $pubCountFirstAuthor : $authorCount : $reach";
 }
 /*

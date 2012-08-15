@@ -1,34 +1,56 @@
 <?php 
 include_once("../lib/init.php");
 $Start = getTime(); 
-$table='orgTemp';
+$table='edge';
 $dataminer=new dataMiner;
 
-clearTable($table);
 //Right now this is limited to organizations that have more than one record from the set, can change whenever though.
-$queryDoctors = "select dstAtomId,srcIsotopeId, count(distinct atomBondId) from atomBonds where bondId in (3,7) and srcAtomId IN (select atomId from mixtureAtoms where mixtureId=1176) group by dstAtomId having count(distinct atomBondId) > 1 order by count( distinct atomBondId) desc";
-echo $queryDoctors;
+$queryDoctors = "select distinct institution from ocreExportFinal where institution!='' order by institution ";
+$avgSQL="select avg(weight) as avg from edge";
+$avgResult=mysql_query($avgSQL);
+$row=mysql_fetch_array($avgResult);
+$baseWeight=$row['avg']*1.5;
 $result = mysql_query($queryDoctors) or die(mysql_error());
 while($row=mysql_fetch_array($result)){
-	$nodeCount++;
-	$getPhysicians="SELECT distinct srcAtomId from atomBonds where dstAtomId=".$row['dstAtomId']. " AND srcAtomId IN (select atomId from mixtureAtoms where mixtureId=1176)";
+
+	$getPhysicians="SELECT distinct atomId from ocreExportFinal where institution='".mysql_escape_string($row['institution']). "'";
 //find org info and add an entity to the organization table
-	getOrgInfo($row['srcIsotopeId'],$row['dstAtomId'],$table);
+	echo $getPhysicians."<BR>";
+	//getOrgInfo($row['srcIsotopeId'],$row['dstAtomId'],$table);
 	$physicianResult=mysql_query($getPhysicians);
+	$nodes=array();
 	while($physicianRow=mysql_fetch_array($physicianResult)){
-		$source=$physicianRow['srcAtomId'];
-		$target=$row['dstAtomId'];
-		$valueArray=array(
+		$nodes[]=$physicianRow['atomId'];
+		
+
+		//$source=$physicianRow['srcAtomId'];
+		//$target=$row['dstAtomId'];
+		/*$valueArray=array(
 			'source'=>$source,
 			'target'=>$target,
 			'weight'=>'8.0',
 			'class'=>'1'
-		);
-		insertQuery($valueArray,'edge');
+		);*/
+		//insertQuery($valueArray,'edge');
 	}
+	for($i=0;$i < sizeof($nodes);$i++){
+		for($k=0;$k <sizeof($nodes);$k++){
+			if($i!==$k){
+				$valueArray=array(
+						'source'=>$nodes[$i],
+						'target'=>$nodes[$k],
+						'weight'=>$baseWeight,
+						'direction'=>'Directed',
+						'class'=>1
+					);
+				insertQuery($valueArray,$table);			
+			}
+		}
+	}
+
+	var_dump($nodes);
 }
 
 $End = getTime(); 
-echo "Time taken = ".number_format(($End - $Start),2)." secs with rows: ".$count;
-
+echo "Time taken = ".number_format(($End - $Start),2)." secs ";
 ?>
