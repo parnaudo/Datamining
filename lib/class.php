@@ -384,6 +384,9 @@
 			}
 			function eFetch($uid){
 				echo $uid."<BR>";
+				if(is_array($uid)){
+					$uid=implode(',',$uid);
+				}
 				$sumParams = array(
 	   		 		'db' => 'pubmed',
 					'tool' => 'SCUcitationminer',
@@ -404,23 +407,40 @@
 				$bookTest= $xml->xpath('/PubmedArticleSet/PubmedBookArticle/BookDocument');
 				$bookTitle=$bookTest[0]->Book->BookTitle;
 				if($bookTitle!=''){
-					echo $bookTitle;
+					echo "BOOKERROR".$bookTitle;
 					return;
 				}
+
 				else{
+				//Get date data here
+				
+				$dateResult=$xml->xpath('/PubmedArticleSet/PubmedArticle/PubmedData');
+				$day=$dateResult[0]->History->PubMedPubDate->Day;
+				if(strlen($day)==1){
+					$day=str_pad($day,2,'0',STR_PAD_LEFT);
+				}
+				$month=$dateResult[0]->History->PubMedPubDate->Month;
+				if(strlen($month)==1){
+					$month=str_pad($month,2,'0',STR_PAD_LEFT);
+				}
+				$year=$dateResult[0]->History->PubMedPubDate->Year;
+				$date=$month."/".$day."/".$year;
+				echo "DATE IS $date";
 	  	  		$result = $xml->xpath('/PubmedArticleSet/PubmedArticle/MedlineCitation');
 					//pull whatever you want from the XML, these two are not available from eSummary
-	  	  		 	$date=$result[0]->Article->Journal->JournalIssue->PubDate->Day." ".$result[0]->Article->Journal->JournalIssue->PubDate->Month." ".$result[0]->Article->Journal->JournalIssue->PubDate->Year;
+	  	  	//	$date=$result[0]->Article->Journal->JournalIssue->PubDate->Day." ".$result[0]->Article->Journal->JournalIssue->PubDate->Month." ".$result[0]->Article->Journal->JournalIssue->PubDate->Year;
+					
 					if( $result[0]->Article->AuthorList->Author !=NULL){
 						$authorCount= $result[0]->Article->AuthorList->Author->count();
+					
 					}
 					else {
 						$authorCount=0;	
 					}
-					$authors=$result[0]->Article->AuthorList->Author;
-					$lastAuthor=$authors[$authorCount]->LastName." ".$authors[$authorCount]->Initials;
+					$authors=$result[0]->Article->AuthorList;
+					//$lastAuthor=$authors[$authorCount]->LastName." ".$authors[$authorCount]->Initials;
 					$meshTerms=$result[0]->MeshHeadingList;
-	  	  		 	$paperInfo=array(
+	  	  			$paperInfo=array(
 						'affiliation'=> $result[0]->Article->Affiliation,
 						'abstract'=> $result[0]->Article->Abstract,
 						'ISSN'=>str_replace('-',"",$result[0]->Article->Journal->ISSN),
@@ -434,12 +454,14 @@
 						'language'=>$result[0]->Article->Language,
 						'title'=>$result[0]->Article->ArticleTitle,
 						'authors'=>$result[0]->Article->AuthorList,
-						'lastAuthor'=>$lastAuthor,
 						'pubType'=>$result[0]->Article->PublicationTypeList,
 						'authorCount'=>$authorCount,
 						'meshTerms'=>$meshTerms,
-								
+									
 				);
+				
+				
+				
 			}
 							
 				return $paperInfo;

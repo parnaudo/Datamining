@@ -29,7 +29,8 @@ echo "starting from $authorID<BR>";
 $filter="(Multiple Sclerosis [MESH FIELDS] OR Multiple Sclerosis [Title] OR Multiple Sclerosis [Journal])";
 //query to get doctor set, can really be from anywhere, I'm pulling from a temporary doctor table that has first, last and middle 
 //$queryDoctors = "select * from largecounts where atomId IN (3814943)";
-$queryDoctors = "select * from ocreComplete o INNER JOIN ocreExportFinal e on Id=atomId where Top200List!='Y'";
+$queryDoctors = "select * from nodeComplete where numPublications < 5";
+
 $result = mysql_query($queryDoctors) or die(mysql_error());
 
 while($row=mysql_fetch_array($result)){
@@ -156,7 +157,19 @@ while($row=mysql_fetch_array($result)){
 							'authorCount'=>$paperInfo['authorCount'],
 							'url'=>$url,
 							'meshTerms'=>$meshTerms					
-						);
+						);/*
+					$valueArray=array(
+	
+							'ISSN'=>$paperInfo['ISSN'],
+							'journal'=>$paperInfo['journal'],
+						
+							'id'=>$paperID,
+							'pubDate'=>$paperInfo['pubDate'],
+
+							'title'=>$paperInfo['title'],
+							'numAuthors'=>$paperInfo['authorCount'],
+					
+						);	*/					
 						insertQuery($valueArray,'papers');
 						$countPaperQuery++;
 					 }

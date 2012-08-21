@@ -1,9 +1,9 @@
 <?php
 include("../lib/init.php");
-$table="nodeComplete";
+$table="node";
 $threshold=1;
-alterNodeTable($table);
-$select="SELECT distinct Id from $table ";
+//alterNodeTable($table);
+$select="Select * from $table where reach < 1";
 $result=mysql_query($select);
 while($row=mysql_fetch_array($result)){
 $pub= new publishingInfo($row['Id']);
@@ -17,6 +17,8 @@ echo $updateQuery;
 mysql_query($updateQuery);
 echo "$pubCount : $pubCountFirstAuthor : $authorCount : $reach";
 }
+echo "starting SCImago..<BR>";
+networkProminence($table);
 /*
 	if($row['paperCount']==$row['truePaperCount']){
 		$author=authorPubmedTransform($row['firstName'],$row['middleName'],$row['lastName']);
